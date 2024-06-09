@@ -1,0 +1,568 @@
+{
+  "data": [
+    {
+      "TaskID": 1,
+      "TaskName": "Task Allocation and Role Assignment",
+      "StartDate": "2024-06-10",
+      "EndDate": "2024-06-14",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 2,
+      "TaskName": "Requirement Analysis and Specification",
+      "StartDate": "2024-06-10",
+      "EndDate": "2024-06-14",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 3,
+      "TaskName": "Initial Meeting and Brainstorming",
+      "StartDate": "2024-06-17",
+      "EndDate": "2024-06-21",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 4,
+      "TaskName": "ER Diagram Creation",
+      "StartDate": "2024-06-24",
+      "EndDate": "2024-06-28",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 5,
+      "TaskName": "Database Schema Design",
+      "StartDate": "2024-06-24",
+      "EndDate": "2024-06-28",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 6,
+      "TaskName": "UI/UX Design",
+      "StartDate": "2024-07-01",
+      "EndDate": "2024-07-05",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 7,
+      "TaskName": "Review and Approval",
+      "StartDate": "2024-07-01",
+      "EndDate": "2024-07-05",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 8,
+      "TaskName": "Database Setup",
+      "StartDate": "2024-07-08",
+      "EndDate": "2024-07-12",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 9,
+      "TaskName": "Backend Development",
+      "StartDate": "2024-07-08",
+      "EndDate": "2024-07-26",
+      "Duration": 15,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 10,
+      "TaskName": "Frontend Development",
+      "StartDate": "2024-07-15",
+      "EndDate": "2024-08-02",
+      "Duration": 15,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 11,
+      "TaskName": "Integration",
+      "StartDate": "2024-08-05",
+      "EndDate": "2024-08-16",
+      "Duration": 10,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 12,
+      "TaskName": "Mid-project Review",
+      "StartDate": "2024-08-12",
+      "EndDate": "2024-08-16",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 13,
+      "TaskName": "Unit Testing",
+      "StartDate": "2024-08-19",
+      "EndDate": "2024-08-23",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 14,
+      "TaskName": "Integration Testing",
+      "StartDate": "2024-08-19",
+      "EndDate": "2024-08-23",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 15,
+      "TaskName": "User Acceptance Testing",
+      "StartDate": "2024-08-26",
+      "EndDate": "2024-08-30",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 16,
+      "TaskName": "Bug Fixing",
+      "StartDate": "2024-08-26",
+      "EndDate": "2024-08-30",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 17,
+      "TaskName": "Documentation",
+      "StartDate": "2024-09-02",
+      "EndDate": "2024-09-13",
+      "Duration": 10,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 18,
+      "TaskName": "Final Review and Feedback",
+      "StartDate": "2024-09-09",
+      "EndDate": "2024-09-20",
+      "Duration": 10,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 19,
+      "TaskName": "Presentation Preparation",
+      "StartDate": "2024-09-16",
+      "EndDate": "2024-09-20",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        },
+        {
+          "resourceId": "Roman Shrestha",
+          "resourceName": "Roman Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Atit Shrestha",
+          "resourceName": "Atit Shrestha",
+          "unit": 100
+        },
+        {
+          "resourceId": "Sagar Chaudhary",
+          "resourceName": "Sagar Chaudhary",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    },
+    {
+      "TaskID": 20,
+      "TaskName": "Project Submission",
+      "StartDate": "2024-09-23",
+      "EndDate": "2024-09-27",
+      "Duration": 5,
+      "Progress": 0,
+      "color": "",
+      "Predecessor": "",
+      "resources": [
+        {
+          "resourceId": "Ranjan Marasini",
+          "resourceName": "Ranjan Marasini",
+          "unit": 100
+        }
+      ],
+      "info": "",
+      "DurationUnit": "day"
+    }
+  ],
+  "resources": [
+    {
+      "resourceId": "Ranjan Marasini",
+      "resourceName": "Ranjan Marasini"
+    },
+    {
+      "resourceId": "Roman Shrestha",
+      "resourceName": "Roman Shrestha"
+    },
+    {
+      "resourceId": "Atit Shrestha",
+      "resourceName": "Atit Shrestha"
+    },
+    {
+      "resourceId": "Sagar Chaudhary",
+      "resourceName": "Sagar Chaudhary"
+    }
+  ],
+  "advanced": {
+    "workWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ]
+  }
+}
