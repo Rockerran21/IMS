@@ -6,10 +6,10 @@ const app = express();
 app.use(bodyParser.json());
 
 const dbConfig = {
-    user: 'your_username',
-    password: 'your_password',
-    server: 'your_server.database.windows.net',
-    database: 'your_database',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_NAME,
     options: {
         encrypt: true,
         enableArithAbort: true
@@ -103,8 +103,8 @@ app.put('/students/:id', async (req, res) => {
             .input('BachlorSubject', sql.VarChar, BachlorSubject)
             .input('HighSchoolGraduated', sql.VarChar, HighSchoolGraduated)
             .input('Grade10Schools', sql.VarChar, Grade10Schools)
-            .input('FinalProject', sql.VarChar, FinalProject)
-            .input('LinkedInProfile', sql.VarChar, LinkedInProfile)
+            .input('FinalProject', sql.VarVar, FinalProject)
+            .input('LinkedInProfile', sql.VarVar, LinkedInProfile)
             .query(`UPDATE Student SET 
                     FirstName = @FirstName, 
                     LastName = @LastName, 

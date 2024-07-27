@@ -1,4 +1,4 @@
-name: Set Up Database
+name: Deploy Application
 
 on:
   push:
@@ -6,113 +6,44 @@ on:
       - main
 
 jobs:
-  setup-database:
+  deploy-app:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
       - name: Log in to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Check if database exists
-        id: check-db
+      - name: Create Azure App Service
         run: |
-          DB_NAME='myDatabase'
-          DB_SERVER='mySqlServer'
-          RESOURCE_GROUP='myResourceGroup'
-          RESULT=$(az sql db show --name $DB_NAME --server $DB_SERVER --resource-group $RESOURCE_GROUP --query "name" -o tsv || echo "notfound")
-          echo "db-name=$RESULT" >> $GITHUB_ENV
-          if [ "$RESULT" = "notfound" ]; then
-            echo "Database not found. Creating database..."
-            az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location eastus --admin-user myAdmin --admin-password MyP@ssword1234
-            az sql db create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name $DB_NAME --service-objective S0
-          else
-            echo "Database already exists."
-          fi
+          az group create --name myResourceGroup --location eastus
+          az appservice plan create --name myAppServicePlan --resource-group myResourceGroup --sku FREE
+          az webapp create --name myWebApp --resource-group myResourceGroup --plan myAppServicePlan
 
-      - name: Set up database schema
-        if: env.db-name == 'notfound'
+      - name: Configure database connection string and app settings
         run: |
-          cat <<EOF > setup.sql
-          CREATE TABLE Student (
-              StudentID INT PRIMARY KEY,
-              FirstName VARCHAR(255),
-              LastName VARCHAR(255),
-              Email VARCHAR(255),
-              CurrentEmployer VARCHAR(255),
-              PastEmployer VARCHAR(255),
-              CurrentField VARCHAR(255),
-              BachlorSubject VARCHAR(255),
-              HighSchoolGraduated VARCHAR(255),
-              Grade10Schools VARCHAR(255),
-              FinalProject VARCHAR(255),
-              LinkedInProfile VARCHAR(255)
-          );
+          connStr=$(az sql db show-connection-string --name myDatabase --server mySqlServer --client ado.net)
+          az webapp config connection-string set --resource-group myResourceGroup --name myWebApp --settings DefaultConnection=$connStr --connection-string-type SQLAzure
+          az webapp config appsettings set --resource-group myResourceGroup --name myWebApp --settings DB_USER=myAdmin DB_PASSWORD=MyP@ssword1234 DB_SERVER=mySqlServer.database.windows.net DB_NAME=myDatabase
 
-          CREATE TABLE Project (
-              ProjectID INT PRIMARY KEY,
-              ProjectName VARCHAR(255),
-              Description VARCHAR(255),
-              StudentID INT,
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Certification (
-              CertificationID INT PRIMARY KEY,
-              CertificationName VARCHAR(255),
-              IssuingAuthority VARCHAR(255),
-              DateObtained DATE,
-              StudentID INT,
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Employment (
-              EmploymentID INT PRIMARY KEY,
-              StudentID INT,
-              EmployerName VARCHAR(255),
-              StartDate DATE,
-              EndDate DATE,
-              JobTitle VARCHAR(255),
-              JobDescription VARCHAR(255),
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Teacher (
-              TeacherID INT PRIMARY KEY,
-              FirstName VARCHAR(255),
-              LastName VARCHAR(255),
-              Email VARCHAR(255),
-              BachelorDegree VARCHAR(255),
-              MasterDegree VARCHAR(255),
-              BachelorSubject VARCHAR(255),
-              MasterSubject VARCHAR(255),
-              LinkedInProfile VARCHAR(255)
-          );
-
-          CREATE TABLE Skill (
-              SkillID INT PRIMARY KEY,
-              SkillName VARCHAR(255)
-          );
-
-          CREATE TABLE StudentSkill (
-              StudentID INT,
-              SkillID INT,
-              PRIMARY KEY (StudentID, SkillID),
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
-              FOREIGN KEY (SkillID) REFERENCES Skill(SkillID)
-          );
-
-          CREATE TABLE Course (
-              CourseID BIGINT PRIMARY KEY,
-              CourseName VARCHAR(255),
-              Description VARCHAR(255),
-              TeacherID INT,
-              FOREIGN KEY (TeacherID) REFERENCES Teacher(TeacherID)
-          );
-          EOF
-
-          sqlcmd -S $DB_SERVER.database.windows.net -U myAdmin -P MyP@ssword1234 -d $DB_NAME -i setup.sql
+      - name: Deploy to Azure Web App
+        run: |
+          cd server
+          zip -r ../myapp.zip .
+          cd ..
+          az webapp deploy --resource-group myResourceGroup --name myWebApp --src-path myapp.zip --type zip
