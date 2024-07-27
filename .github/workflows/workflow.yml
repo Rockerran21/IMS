@@ -23,7 +23,7 @@ jobs:
         run: |
           DB_NAME='myDatabase'
           DB_SERVER='mySqlServer'
-          RESOURCE_GROUP='myResourceGroup'
+          RESOURCE_GROUP='IMSResourceGroup'
           RESULT=$(az sql db show --name $DB_NAME --server $DB_SERVER --resource-group $RESOURCE_GROUP --query "name" -o tsv || echo "notfound")
           echo "db-name=$RESULT" >> $GITHUB_ENV
           if [ "$RESULT" = "notfound" ]; then

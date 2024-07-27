@@ -31,19 +31,18 @@ jobs:
 
       - name: Create Azure App Service
         run: |
-          az group create --name myResourceGroup --location eastus
-          az appservice plan create --name myAppServicePlan --resource-group myResourceGroup --sku FREE
-          az webapp create --name myWebApp --resource-group myResourceGroup --plan myAppServicePlan
+          az appservice plan create --name myAppServicePlan --resource-group IMSResourceGroup --sku FREE
+          az webapp create --name myWebApp --resource-group IMSResourceGroup --plan myAppServicePlan
 
       - name: Configure database connection string and app settings
         run: |
           connStr=$(az sql db show-connection-string --name myDatabase --server mySqlServer --client ado.net)
-          az webapp config connection-string set --resource-group myResourceGroup --name myWebApp --settings DefaultConnection=$connStr --connection-string-type SQLAzure
-          az webapp config appsettings set --resource-group myResourceGroup --name myWebApp --settings DB_USER=myAdmin DB_PASSWORD=MyP@ssword1234 DB_SERVER=mySqlServer.database.windows.net DB_NAME=myDatabase
+          az webapp config connection-string set --resource-group IMSResourceGroup --name myWebApp --settings DefaultConnection=$connStr --connection-string-type SQLAzure
+          az webapp config appsettings set --resource-group IMSResourceGroup --name myWebApp --settings DB_USER=myAdmin DB_PASSWORD=MyP@ssword1234 DB_SERVER=mySqlServer.database.windows.net DB_NAME=myDatabase
 
       - name: Deploy to Azure Web App
         run: |
           cd server
           zip -r ../myapp.zip .
           cd ..
-          az webapp deploy --resource-group myResourceGroup --name myWebApp --src-path myapp.zip --type zip
+          az webapp deploy --resource-group IMSResourceGroup --name myWebApp --src-path myapp.zip --type zip
