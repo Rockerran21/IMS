@@ -23,12 +23,13 @@ jobs:
         run: |
           DB_NAME='myDatabase'
           DB_SERVER='mySqlServer'
-          RESOURCE_GROUP='IMSResourceGroup'
+          RESOURCE_GROUP='demoResourceGroup'  # Updated resource group
           ADMIN_USER='myAdmin'
           ADMIN_PASSWORD='MyP@ssword1234'
+          LOCATION='centralus'  # Updated region
 
           # Create SQL server
-          az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location eastus --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
+          az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
 
           # Create SQL database
           az sql db create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name $DB_NAME --service-objective S0

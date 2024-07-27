@@ -49,18 +49,18 @@ jobs:
 
       - name: Create Azure App Service
         run: |
-          az appservice plan create --name myAppServicePlan --resource-group IMSResourceGroup --sku FREE
-          az webapp create --name myWebApp --resource-group IMSResourceGroup --plan myAppServicePlan
+          az appservice plan create --name myAppServicePlan --resource-group demoResourceGroup --sku FREE
+          az webapp create --name myWebApp --resource-group demoResourceGroup --plan myAppServicePlan
 
       - name: Configure database connection string and app settings
         run: |
           connStr=$(az sql db show-connection-string --name $DB_NAME --server $DB_SERVER --client ado.net)
-          az webapp config connection-string set --resource-group IMSResourceGroup --name myWebApp --settings DefaultConnection=$connStr --connection-string-type SQLAzure
-          az webapp config appsettings set --resource-group IMSResourceGroup --name myWebApp --settings DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD DB_SERVER=$DB_SERVER DB_NAME=$DB_NAME
+          az webapp config connection-string set --resource-group demoResourceGroup --name myWebApp --settings DefaultConnection=$connStr --connection-string-type SQLAzure
+          az webapp config appsettings set --resource-group demoResourceGroup --name myWebApp --settings DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD DB_SERVER=$DB_SERVER DB_NAME=$DB_NAME
 
       - name: Deploy to Azure Web App
         run: |
           cd server
           zip -r ../myapp.zip .
           cd ..
-          az webapp deploy --resource-group IMSResourceGroup --name myWebApp --src-path myapp.zip --type zip
+          az webapp deploy --resource-group demoResourceGroup --name myWebApp --src-path myapp.zip --type zip
