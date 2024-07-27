@@ -22,11 +22,11 @@ jobs:
         id: create-db
         run: |
           DB_NAME='myDatabase'
-          DB_SERVER='mySqlServer'
-          RESOURCE_GROUP='demoResourceGroup'  # Updated resource group
+          DB_SERVER='llamatestingdatabasefor3-1'  # Updated to a unique name
+          RESOURCE_GROUP='demoResourceGroup'
           ADMIN_USER='myAdmin'
           ADMIN_PASSWORD='MyP@ssword1234'
-          LOCATION='centralus'  # Updated region
+          LOCATION='centralus'
 
           # Create SQL server
           az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD

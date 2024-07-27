@@ -60,7 +60,6 @@ jobs:
 
       - name: Deploy to Azure Web App
         run: |
-          cd server
           zip -r ../myapp.zip .
           cd ..
           az webapp deploy --resource-group demoResourceGroup --name myWebApp --src-path myapp.zip --type zip
