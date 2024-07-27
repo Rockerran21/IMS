@@ -31,6 +31,13 @@ jobs:
           # Create SQL server
           az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
 
+          # Add firewall rule to allow Azure services
+          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name AllowAzureIps --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+
+          # Add firewall rule to allow local IP
+          MY_IP=$(curl -s http://whatismyip.akamai.com/)
+          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name MyLocalIP --start-ip-address $MY_IP --end-ip-address $MY_IP
+
           # Create SQL database
           az sql db create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name $DB_NAME --service-objective S0
 
@@ -39,6 +46,9 @@ jobs:
           echo "DB_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
           echo "DB_SERVER=$DB_SERVER.database.windows.net" >> $GITHUB_ENV
           echo "DB_NAME=$DB_NAME" >> $GITHUB_ENV
+
+      - name: Wait for SQL Server to be fully provisioned
+        run: sleep 60  # Wait for 1 minute
 
       - name: Set up database schema
         run: |
