@@ -1,5 +1,5 @@
 # Define the subscription ID
-$subscriptionId = "f8f4576f-80fc-4899-a044-69d1d4877dfd"
+$subscriptionId = "2d0b03c0-875c-46fa-9993-32a30821afc5"
 
 # Function to check and install Az module
 function Ensure-AzModule {
