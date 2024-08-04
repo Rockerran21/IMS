@@ -23,7 +23,7 @@ jobs:
         run: |
           DB_NAME='llamatestingdatabasefor3-1'  # Updated database name
           DB_SERVER='llamatestingdatabasefor3-1'  # Updated to a unique name
-          RESOURCE_GROUP='demoResourceGroup'
+          RESOURCE_GROUP='demoResourceGroup' #Updated the RG Name 
           ADMIN_USER='myAdmin'
           ADMIN_PASSWORD='MyP@ssword1234'
           LOCATION='centralus'
