@@ -26,7 +26,7 @@ jobs:
           RESOURCE_GROUP='demoResourceGroup' #Updated the RG Name 
           ADMIN_USER='myAdmin'
           ADMIN_PASSWORD='MyP@ssword1234'
-          LOCATION='centralus'
+          LOCATION='centralus' # Added new client Secret 
 
           echo "Creating SQL server..."
           az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
