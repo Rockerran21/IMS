@@ -21,19 +21,19 @@ jobs:
       - name: Create SQL server and database
         id: create-db
         run: |
-          DB_NAME='llamatestingdatabasefor3-1'  # Updated database name
-          DB_SERVER='llamatestingdatabasefor3-1'  # Updated to a unique name
-          RESOURCE_GROUP='demoResourceGroup' #Updated the RG Name 
+          DB_NAME='llamatestingdatabasefor3-1'
+          DB_SERVER='llamatestingdatabasefor3-1'
+          RESOURCE_GROUP='demoResourceGroup'
           ADMIN_USER='myAdmin'
           ADMIN_PASSWORD='MyP@ssword1234'
-          LOCATION='centralus' # Added new client Secret 
+          LOCATION='centralus'
 
           echo "Creating SQL server..."
           az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
 
-          echo "Setting firewall rule to allow Azure services..."
-          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name MyLocalIP --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
-          # Added IP for all inbound and outbound access 
+          echo "Setting firewall rule to allow all IPs..."
+          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name AllowAllIps --start-ip-address 0.0.0.0 --end-ip-address 255.255.255.255
+
           echo "Creating SQL database..."
           az sql db create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name $DB_NAME --service-objective S0
 
@@ -43,95 +43,6 @@ jobs:
           echo "DB_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
           echo "DB_SERVER=$DB_SERVER.database.windows.net" >> $GITHUB_ENV
           echo "DB_NAME=$DB_NAME" >> $GITHUB_ENV
-
-      - name: Wait for SQL Server to be fully provisioned
-        run: |
-          echo "Waiting for SQL Server to be fully provisioned..."
-          sleep 600  # Wait for 1 minute
-
-      - name: Set up database schema
-        run: |
-          echo "Setting up database schema..."
-          cat <<EOF > setup.sql
-          CREATE TABLE Student (
-              StudentID INT PRIMARY KEY,
-              FirstName VARCHAR(255),
-              LastName VARCHAR(255),
-              Email VARCHAR(255),
-              CurrentEmployer VARCHAR(255),
-              PastEmployer VARCHAR(255),
-              CurrentField VARCHAR(255),
-              BachlorSubject VARCHAR(255),
-              HighSchoolGraduated VARCHAR(255),
-              Grade10Schools VARCHAR(255),
-              FinalProject VARCHAR(255),
-              LinkedInProfile VARCHAR(255)
-          );
-
-          CREATE TABLE Project (
-              ProjectID INT PRIMARY KEY,
-              ProjectName VARCHAR(255),
-              Description VARCHAR(255),
-              StudentID INT,
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Certification (
-              CertificationID INT PRIMARY KEY,
-              CertificationName VARCHAR(255),
-              IssuingAuthority VARCHAR(255),
-              DateObtained DATE,
-              StudentID INT,
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Employment (
-              EmploymentID INT PRIMARY KEY,
-              StudentID INT,
-              EmployerName VARCHAR(255),
-              StartDate DATE,
-              EndDate DATE,
-              JobTitle VARCHAR(255),
-              JobDescription VARCHAR(255),
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
-          );
-
-          CREATE TABLE Teacher (
-              TeacherID INT PRIMARY KEY,
-              FirstName VARCHAR(255),
-              LastName VARCHAR(255),
-              Email VARCHAR(255),
-              BachelorDegree VARCHAR(255),
-              MasterDegree VARCHAR(255),
-              BachelorSubject VARCHAR(255),
-              MasterSubject VARCHAR(255),
-              LinkedInProfile VARCHAR(255)
-          );
-
-          CREATE TABLE Skill (
-              SkillID INT PRIMARY KEY,
-              SkillName VARCHAR(255)
-          );
-
-          CREATE TABLE StudentSkill (
-              StudentID INT,
-              SkillID INT,
-              PRIMARY KEY (StudentID, SkillID),
-              FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
-              FOREIGN KEY (SkillID) REFERENCES Skill(SkillID)
-          );
-
-          CREATE TABLE Course (
-              CourseID BIGINT PRIMARY KEY,
-              CourseName VARCHAR(255),
-              Description VARCHAR(255),
-              TeacherID INT,
-              FOREIGN KEY (TeacherID) REFERENCES Teacher(TeacherID)
-          );
-          EOF
-
-          echo "Running sqlcmd to set up schema... This may take a while"
-          sqlcmd -S $DB_SERVER.database.windows.net -U $DB_USER -P $DB_PASSWORD -d $DB_NAME -i setup.sql
 
       - name: Save database credentials
         run: |

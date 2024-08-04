@@ -1,0 +1,114 @@
+name: Deploy Schema
+
+on:
+  workflow_dispatch:
+    inputs:
+      db_server:
+        description: 'Database server (e.g., myserver.database.windows.net)'
+        required: true
+      db_name:
+        description: 'Database name'
+        required: true
+      db_user:
+        description: 'Database user'
+        required: true
+      db_password:
+        description: 'Database password'
+        required: true
+
+jobs:
+  deploy-schema:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up database schema
+        run: |
+          DB_SERVER=${{ github.event.inputs.db_server }}
+          DB_NAME=${{ github.event.inputs.db_name }}
+          DB_USER=${{ github.event.inputs.db_user }}
+          DB_PASSWORD=${{ github.event.inputs.db_password }}
+
+          echo "Setting up database schema..."
+          cat <<EOF > setup.sql
+          CREATE TABLE Student (
+              StudentID INT PRIMARY KEY,
+              FirstName VARCHAR(255),
+              LastName VARCHAR(255),
+              Email VARCHAR(255),
+              CurrentEmployer VARCHAR(255),
+              PastEmployer VARCHAR(255),
+              CurrentField VARCHAR(255),
+              BachlorSubject VARCHAR(255),
+              HighSchoolGraduated VARCHAR(255),
+              Grade10Schools VARCHAR(255),
+              FinalProject VARCHAR(255),
+              LinkedInProfile VARCHAR(255)
+          );
+
+          CREATE TABLE Project (
+              ProjectID INT PRIMARY KEY,
+              ProjectName VARCHAR(255),
+              Description VARCHAR(255),
+              StudentID INT,
+              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+          );
+
+          CREATE TABLE Certification (
+              CertificationID INT PRIMARY KEY,
+              CertificationName VARCHAR(255),
+              IssuingAuthority VARCHAR(255),
+              DateObtained DATE,
+              StudentID INT,
+              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+          );
+
+          CREATE TABLE Employment (
+              EmploymentID INT PRIMARY KEY,
+              StudentID INT,
+              EmployerName VARCHAR(255),
+              StartDate DATE,
+              EndDate DATE,
+              JobTitle VARCHAR(255),
+              JobDescription VARCHAR(255),
+              FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+          );
+
+          CREATE TABLE Teacher (
+              TeacherID INT PRIMARY KEY,
+              FirstName VARCHAR(255),
+              LastName VARCHAR(255),
+              Email VARCHAR(255),
+              BachelorDegree VARCHAR(255),
+              MasterDegree VARCHAR(255),
+              BachelorSubject VARCHAR(255),
+              MasterSubject VARCHAR(255),
+              LinkedInProfile VARCHAR(255)
+          );
+
+          CREATE TABLE Skill (
+              SkillID INT PRIMARY KEY,
+              SkillName VARCHAR(255)
+          );
+
+          CREATE TABLE StudentSkill (
+              StudentID INT,
+              SkillID INT,
+              PRIMARY KEY (StudentID, SkillID),
+              FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+              FOREIGN KEY (SkillID) REFERENCES Skill(SkillID)
+          );
+
+          CREATE TABLE Course (
+              CourseID BIGINT PRIMARY KEY,
+              CourseName VARCHAR(255),
+              Description VARCHAR(255),
+              TeacherID INT,
+              FOREIGN KEY (TeacherID) REFERENCES Teacher(TeacherID)
+          );
+          EOF
+
+          echo "Running sqlcmd to set up schema..."
+          sqlcmd -S $DB_SERVER -U $DB_USER -P $DB_PASSWORD -d $DB_NAME -i setup.sql
