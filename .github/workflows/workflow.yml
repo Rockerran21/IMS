@@ -130,7 +130,7 @@ jobs:
           );
           EOF
 
-          echo "Running sqlcmd to set up schema..."
+          echo "Running sqlcmd to set up schema... This may take a while"
           sqlcmd -S $DB_SERVER.database.windows.net -U $DB_USER -P $DB_PASSWORD -d $DB_NAME -i setup.sql
 
       - name: Save database credentials
