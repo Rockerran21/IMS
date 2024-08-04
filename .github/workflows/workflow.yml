@@ -32,8 +32,8 @@ jobs:
           az sql server create --name $DB_SERVER --resource-group $RESOURCE_GROUP --location $LOCATION --admin-user $ADMIN_USER --admin-password $ADMIN_PASSWORD
 
           echo "Setting firewall rule to allow Azure services..."
-          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name MyLocalIP --start-ip-address 0.0.0.0 --end-ip-address 255.255.255.255
-
+          az sql server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name MyLocalIP --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+          # Added IP for all inbound and outbound access 
           echo "Creating SQL database..."
           az sql db create --resource-group $RESOURCE_GROUP --server $DB_SERVER --name $DB_NAME --service-objective S0
 
@@ -47,7 +47,7 @@ jobs:
       - name: Wait for SQL Server to be fully provisioned
         run: |
           echo "Waiting for SQL Server to be fully provisioned..."
-          sleep 60  # Wait for 1 minute
+          sleep 600  # Wait for 1 minute
 
       - name: Set up database schema
         run: |
