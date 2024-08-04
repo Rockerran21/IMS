@@ -24,6 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install SQL Server ODBC Driver
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          sudo add-apt-repository "$(curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list)"
+          sudo apt-get update
+          sudo apt-get install -y msodbcsql17
+
       - name: Set up database schema
         run: |
           DB_SERVER=${{ github.event.inputs.db_server }}
@@ -111,4 +118,4 @@ jobs:
           EOF
 
           echo "Running sqlcmd to set up schema..."
-          sqlcmd -S $DB_SERVER -U $DB_USER -P $DB_PASSWORD -d $DB_NAME -i setup.sql
+          sqlcmd -S tcp:$DB_SERVER,1433 -d $DB_NAME -U $DB_USER -P $DB_PASSWORD -i setup.sql
