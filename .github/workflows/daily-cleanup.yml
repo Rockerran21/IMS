@@ -35,9 +35,8 @@ jobs:
           # Ensure Az module is installed and imported
           Ensure-AzModule
           
-          # Connect to Azure account
-          Write-Host "Logging in to Azure..."
-          Connect-AzAccount
+          # Connect to Azure account (handled by azure/login action)
+          Write-Host "Logged in to Azure with Service Principal"
           
           # Select the specified subscription
           Write-Host "Selecting subscription $subscriptionId..."
@@ -117,3 +116,4 @@ jobs:
           }
           
           Write-Host "All resources, deployments, role assignments, and policies have been deleted. Monitor the Azure portal for any remaining resources."
+
