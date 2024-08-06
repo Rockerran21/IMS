@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Overview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .diagram {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .components, .steps {
+            margin-top: 20px;
+        }
+        .components h2, .steps h2 {
+            font-size: 24px;
+            color: #333;
+        }
+        .components ul, .steps ul {
+            list-style-type: disc;
+            margin: 10px 0 0 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Architecture Overview</h1>
+    <p>This document provides an architecture diagram and detailed explanation of the key components involved in deploying the Llama 3.1 model in an Azure Kubernetes Service (AKS) cluster.</p>
+
+    <div class="diagram">
+        <h2>Architecture Diagram</h2>
+        <img src="./RA%20for%20ChatBot%20Application.png" alt="Architecture Diagram">
+    </div>
+
+    <div class="components">
+        <h2>Components</h2>
+        <ul>
+            <li><strong>Azure Kubernetes Service (AKS):</strong> The central component that orchestrates the deployment, scaling, and management of Docker containers.</li>
+            <li><strong>Docker:</strong> Used for containerizing the Ollama model.</li>
+            <li><strong>Ollama Model Container:</strong> The Docker container that runs the Ollama model.</li>
+            <li><strong>Azure Container Registry (ACR):</strong> The repository for storing and managing Docker container images.</li>
+            <li><strong>Azure Virtual Network (VNet):</strong> Provides network connectivity between AKS and other Azure resources.</li>
+            <li><strong>Load Balancer:</strong> Distributes incoming network traffic across multiple instances of the Ollama model container.</li>
+            <li><strong>Azure Key Vault:</strong> Securely stores and manages sensitive information such as keys, secrets, and certificates.</li>
+            <li><strong>Ingress Controller:</strong> Manages external access to the services in the AKS cluster, usually HTTP and HTTPS routes.</li>
+            <li><strong>End User:</strong> Interacts with the Chatbot.</li>
+            <li><strong>Chatbot:</strong> Requests model predictions from AKS.</li>
+        </ul>
+    </div>
+
+    <div class="steps">
+        <h2>Steps to Deploy the Llama 3.1 Model on AKS</h2>
+        <ol>
+            <li><strong>Setup Azure Kubernetes Service (AKS):</strong> Create an AKS cluster in the Azure portal.</li>
+            <pre>
+az aks create --resource-group myResourceGroup --name myAKSCluster --node-count 1 --enable-addons monitoring --generate-ssh-keys
+                </pre>
+            <li><strong>Build and Push Docker Image:</strong> Build a Docker image for the Ollama model and push it to Azure Container Registry (ACR).</li>
+            <pre>
+# Dockerfile
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y python3-pip
+COPY . /app
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+CMD ["python3", "app.py"]
+
+# Build and Push
+docker build -t ollama-model .
+az acr login --name myACR
+docker tag ollama-model myacr.azurecr.io/ollama-model:v1
+docker push myacr.azurecr.io/ollama-model:v1
+                </pre>
+            <li><strong>Deploy the Model to AKS:</strong> Create a Kubernetes deployment and service for the Ollama model.</li>
+            <pre>
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama-model
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ollama-model
+  template:
+    metadata:
+      labels:
+        app: ollama-model
+    spec:
+      containers:
+      - name: ollama-model
+        image: myacr.azurecr.io/ollama-model:v1
+        ports:
+        - containerPort: 80
+
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-model
+spec:
+  selector:
+    app: ollama-model
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+# Apply the configurations
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+                </pre>
+            <li><strong>Configure Ingress Controller:</strong> Setup an Ingress Controller to manage external access to the services in the AKS cluster.</li>
+            <pre>
+# ingress-controller.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ollama-ingress
+spec:
+  rules:
+  - host: ollama.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ollama-model
+            port:
+              number: 80
+
+# Apply the ingress configuration
+kubectl apply -f ingress-controller.yaml
+                </pre>
+            <li><strong>Setup Azure Key Vault:</strong> Store and manage sensitive information such as keys, secrets, and certificates.</li>
+            <pre>
+# Create Key Vault
+az keyvault create --name myKeyVault --resource-group myResourceGroup --location eastus
+
+# Store secrets
+az keyvault secret set --vault-name myKeyVault --name "MySecret" --value "mySecretValue"
+                </pre>
+            <li><strong>Connect AKS to Key Vault:</strong> Configure AKS to access secrets from Azure Key Vault.</li>
+            <pre>
+# Assign managed identity to AKS
+az aks update -g myResourceGroup -n myAKSCluster --enable-managed-identity
+
+# Assign Key Vault access policy
+az keyvault set-policy -n myKeyVault --secret-permissions get --spn <your-aks-managed-identity-client-id>
+                </pre>
+            <li><strong>Deploy Chatbot:</strong> Deploy the chatbot application that interacts with end-users and requests model predictions from AKS.</li>
+            <pre>
+# deployment.yaml for chatbot
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chatbot
+  template:
+    metadata:
+      labels:
+        app: chatbot
+    spec:
+      containers:
+      - name: chatbot
+        image: myacr.azurecr.io/chatbot:v1
+        ports:
+        - containerPort: 8080
+
+# service.yaml for chatbot
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot
+spec:
+  selector:
+    app: chatbot
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+
+# Apply the configurations
+kubectl apply -f chatbot-deployment.yaml
+kubectl apply -f chatbot-service.yaml
+                </pre>
+        </ol>
+    </div>
+</div>
+</body>
+</html>
