@@ -2,7 +2,7 @@ name: Daily Cleanup
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # This means the action will run at 12 AM UTC every day
+    - cron: '30 2 * * *'  # This means the action will run at 02:30 AM UTC every day
   workflow_dispatch:
 
 jobs:
