@@ -15,17 +15,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Uninstall AzureRM and Install Az module
+      - name: Install Az Module
         shell: pwsh
         run: |
-          # Uninstall AzureRM module if it exists
-          if (Get-Module -ListAvailable -Name AzureRM) {
-              Write-Host "AzureRM module found. Uninstalling AzureRM module..."
-              Uninstall-Module -Name AzureRM -AllVersions -Force -ErrorAction SilentlyContinue
-          } else {
-              Write-Host "AzureRM module not found."
-          }
-          
           # Install Az module
           if (-not (Get-Module -ListAvailable -Name Az)) {
               Write-Host "Az module not found. Installing Az module..."
@@ -34,7 +26,7 @@ jobs:
               Write-Host "Az module is already installed."
           }
 
-      - name: Run cleanup script
+      - name: Run Cleanup Script
         shell: pwsh
         run: |
           # Import Az module
