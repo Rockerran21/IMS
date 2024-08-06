@@ -14,24 +14,31 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          enable-AzPSSession: false
 
-      - name: Ensure AzureRM module is installed
+      - name: Uninstall AzureRM and Install Az module
         shell: pwsh
         run: |
-          # Check if AzureRM module is installed
-          if (-not (Get-Module -ListAvailable -Name AzureRM)) {
-              Write-Host "AzureRM module not found. Installing AzureRM module..."
-              Install-Module -Name AzureRM -AllowClobber -Force
+          # Uninstall AzureRM module if it exists
+          if (Get-Module -ListAvailable -Name AzureRM) {
+              Write-Host "AzureRM module found. Uninstalling AzureRM module..."
+              Uninstall-Module -Name AzureRM -AllVersions -Force -ErrorAction SilentlyContinue
           } else {
-              Write-Host "AzureRM module is already installed."
+              Write-Host "AzureRM module not found."
+          }
+          
+          # Install Az module
+          if (-not (Get-Module -ListAvailable -Name Az)) {
+              Write-Host "Az module not found. Installing Az module..."
+              Install-Module -Name Az -AllowClobber -Force
+          } else {
+              Write-Host "Az module is already installed."
           }
 
       - name: Run cleanup script
         shell: pwsh
         run: |
-          # Import AzureRM module
-          Import-Module AzureRM
+          # Import Az module
+          Import-Module Az
           
           # Define the subscription ID
           $subscriptionId = "2d0b03c0-875c-46fa-9993-32a30821afc5"
@@ -39,18 +46,18 @@ jobs:
           # Connect to Azure account (handled by azure/login action)
           Write-Host "Logged in to Azure with Service Principal"
           
-          # Set the context to the specified subscription
+          # Select the specified subscription
           Write-Host "Selecting subscription $subscriptionId..."
-          Select-AzureRmSubscription -SubscriptionId $subscriptionId
+          Set-AzContext -SubscriptionId $subscriptionId
           
           # Function to delete all resource groups and wait for completion
           function Delete-AllResourceGroups {
               Write-Host "Retrieving all resource groups in the subscription..."
-              $resourceGroups = Get-AzureRmResourceGroup
+              $resourceGroups = Get-AzResourceGroup
               $jobs = @()
               foreach ($rg in $resourceGroups) {
                   Write-Host "Deleting resource group $($rg.ResourceGroupName)..."
-                  $jobs += Remove-AzureRmResourceGroup -Name $rg.ResourceGroupName -Force -AsJob
+                  $jobs += Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force -AsJob
               }
               # Wait for all jobs to complete
               foreach ($job in $jobs) {
@@ -61,41 +68,41 @@ jobs:
           # Function to delete all deployments and wait for completion
           function Delete-AllDeployments {
               Write-Host "Retrieving all deployments in the subscription..."
-              $deployments = Get-AzureRmDeployment
+              $deployments = Get-AzDeployment
               foreach ($deployment in $deployments) {
                   Write-Host "Deleting deployment $($deployment.DeploymentName)..."
-                  Remove-AzureRmDeployment -Name $deployment.DeploymentName -Force
+                  Remove-AzDeployment -Name $deployment.DeploymentName -Force
               }
           }
           
           # Function to delete all role assignments and wait for completion
           function Delete-AllRoleAssignments {
               Write-Host "Retrieving all role assignments in the subscription..."
-              $roleAssignments = Get-AzureRmRoleAssignment
+              $roleAssignments = Get-AzRoleAssignment
               foreach ($roleAssignment in $roleAssignments) {
                   Write-Host "Deleting role assignment $($roleAssignment.Name)..."
-                  Remove-AzureRmRoleAssignment -ObjectId $roleAssignment.ObjectId -RoleDefinitionName $roleAssignment.RoleDefinitionName -Scope $roleAssignment.Scope
+                  Remove-AzRoleAssignment -ObjectId $roleAssignment.ObjectId -RoleDefinitionName $roleAssignment.RoleDefinitionName -Scope $roleAssignment.Scope
               }
           }
           
           # Function to delete all policies and wait for completion
           function Delete-AllPolicies {
               Write-Host "Retrieving all policies in the subscription..."
-              $policies = Get-AzureRmPolicyAssignment
+              $policies = Get-AzPolicyAssignment
               foreach ($policy in $policies) {
                   Write-Host "Deleting policy $($policy.Name)..."
-                  Remove-AzureRmPolicyAssignment -Name $policy.Name -Scope $policy.Scope
+                  Remove-AzPolicyAssignment -Name $policy.Name -Scope $policy.Scope
               }
           }
           
           # Function to delete orphaned resources and wait for completion
           function Delete-AllOrphanedResources {
               Write-Host "Retrieving all resources in the subscription..."
-              $resources = Get-AzureRmResource
+              $resources = Get-AzResource
               foreach ($resource in $resources) {
                   Write-Host "Deleting resource $($resource.Name) in group $($resource.ResourceGroupName)..."
-                  $apiVersion = (Get-AzureRmResourceProvider -ProviderNamespace $resource.ResourceType.Split('/')[0]).ResourceTypes | Where-Object ResourceTypeName -eq $resource.ResourceType.Split('/')[1] | Select-Object -ExpandProperty ApiVersions | Sort-Object -Descending | Select-Object -First 1
-                  Remove-AzureRmResource -ResourceId $resource.ResourceId -Force -ApiVersion $apiVersion
+                  $apiVersion = (Get-AzResourceProvider -ProviderNamespace $resource.ResourceType.Split('/')[0]).ResourceTypes | Where-Object ResourceTypeName -eq $resource.ResourceType.Split('/')[1] | Select-Object -ExpandProperty ApiVersions | Sort-Object -Descending | Select-Object -First 1
+                  Remove-AzResource -ResourceId $resource.ResourceId -Force -ApiVersion $apiVersion
               }
           }
           
@@ -108,7 +115,7 @@ jobs:
           
           # Final check to ensure everything is deleted
           Write-Host "Final check to ensure all resources are deleted..."
-          $remainingResources = Get-AzureRmResource
+          $remainingResources = Get-AzResource
           if ($remainingResources) {
               Write-Host "Some resources could not be deleted:"
               $remainingResources | Format-Table -Property Name, ResourceGroupName, ResourceType, Location
