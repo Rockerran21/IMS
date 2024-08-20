@@ -1,0 +1,126 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root {
+  --blue: #3f5bee;
+  --yellow: #e8be1c;
+  --white: #fff;
+  --black: #000;
+}
+body {
+  height: auto;
+}
+.header {
+  background-image: linear-gradient(to left, #e8be1c, #3f5bee, #e8be1c);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-logo {
+  padding-left: 2rem;
+}
+.title-name {
+  font-size: 1.6rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bold;
+  color: var(--white);
+}
+.header-last {
+  display: flex;
+  gap: 2.5rem;
+  padding-right: 2rem;
+}
+.last-haf {
+  font-size: 1rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bold;
+  color: var(--white);
+  cursor: pointer;
+}
+.bar {
+  height: 0.4rem;
+  border: 1px solid var(--black);
+}
+
+.body {
+  background-color: var(--blue);
+}
+.body-top {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 8rem;
+  padding-bottom: 5.52rem;
+}
+.body-reg {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.body-user {
+  text-align: center;
+}
+.body-user-txt {
+  color: var(--white);
+  font-size: 2rem;
+  font-weight: bold;
+}
+.body-reg-mail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.body-reg-mailtxt {
+  font-size: 1rem;
+  color: var(--white);
+  font-weight: 500;
+}
+.body-reg-mailinp {
+  width: 15rem;
+  height: 2rem;
+  padding: 1rem;
+  border-radius: 0.3rem;
+  border: none;
+}
+.body-check {
+  display: flex;
+  gap: 1rem;
+}
+.body-checkbox {
+  cursor: pointer;
+}
+.body-checkbox-txt {
+  color: var(--white);
+}
+.body-signup {
+  height: 2rem;
+  width: 15rem;
+  border: 1px black solid;
+  border-radius: 0.3rem;
+  background-color: var(--yellow);
+  text-align: center;
+  padding-top: 0.2rem;
+  cursor: pointer;
+}
+.body-signup-txt {
+  color: var(--white);
+  font-weight: bold;
+}
+.body-forget {
+  text-align: center;
+}
+.body-forget-txt {
+  color: var(--white);
+}
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: black;
+}
+.body-or {
+  text-align: center;
+}
+.body-or-txt {
+  color: var(--white);
+}
