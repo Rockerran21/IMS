@@ -55,7 +55,7 @@
               <p class="body-checkbox-txt">Remember Me</p>
             </div>
             <div class="body-signup">
-              <p class="body-signup-txt">Log In</p>
+              <p class="body-signup-txt" onclick="handleLogin()">Log In</p>
             </div>
             <div class="body-forget">
               <p class="body-forget-txt">Forgetten Password ?</p>
@@ -68,5 +68,34 @@
         </div>
       </section>
     </div>
+    <script>
+      async function handleLogin() {
+        const email = document.querySelector('input[type="email"]').value;
+        const password = document.querySelector('input[type="password"]').value;
+
+        try {
+          const response = await fetch('http://localhost:8080/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.status === 200) {
+            alert('Login successful');
+            // Redirect to admin dashboard or any other page
+            window.location.href = 'addStudentPage.html';
+          } else {
+            alert('Login failed: ' + data.message);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('An error occurred during login');
+        }
+      }
+    </script>
   </body>
 </html>

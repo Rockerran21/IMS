@@ -75,4 +75,40 @@
       </section>
     </div>
   </body>
+  <script>
+    document.querySelector('.body-signup').addEventListener('click', async () => {
+      const email = document.querySelector('.body-reg-mailinp[type="email"]').value;
+      const password = document.querySelector('.body-reg-mailinp[type="password"]').value;
+      const confirmPassword = document.querySelectorAll('.body-reg-mailinp[type="password"]')[1].value;
+      const phone = ""; // You can also add a phone input and capture it here if needed
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8080/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password, phone })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Signup successful!');
+          window.location.href = 'adminLoginPage.html';  // Replace with your login page URL
+        } else {
+          alert('Signup failed: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error during signup:', error);
+        alert('An error occurred during signup');
+      }
+    });
+  </script>
+
 </html>
