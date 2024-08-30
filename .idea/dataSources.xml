@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@imscluster.0zdbhrm.mongodb.net" uuid="9f043035-6296-475a-be68-cd22d8bbf138">
+    <data-source source="LOCAL" name="MongoDB" uuid="e8831059-7457-41b2-b497-2c7ab13d4c9a">
       <driver-ref>mongo</driver-ref>
       <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
-      <jdbc-url>mongodb+srv://imscluster.0zdbhrm.mongodb.net/?retryWrites=true&amp;w=majority&amp;appName=IMSCluster</jdbc-url>
+      <jdbc-url>MONGODB_URI=mongodb+srv://Ranjan:DmAcun8OZOA4%239%40SZ%3F55F8NvXDZWH4s4s79WaOqk@imscluster.4t9sg.mongodb.net/?retryWrites=true&amp;w=majority&amp;appName=IMSCluster</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

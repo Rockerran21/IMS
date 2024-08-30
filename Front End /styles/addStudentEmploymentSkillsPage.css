@@ -1,0 +1,136 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    --blue: #3f5bee;
+    --yellow: #e8be1c;
+    --white: #fff;
+    --black: #000;
+}
+.header {
+    background-image: linear-gradient(to left, #e8be1c, #3f5bee, #e8be1c);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+}
+.header-logo {
+    padding-left: 2rem;
+}
+.title-name {
+    font-size: 1.6rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    color: var(--white);
+}
+.header-last {
+    display: flex;
+    gap: 2.5rem;
+    padding-right: 2rem;
+}
+.last-haf {
+    font-size: 1rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    color: var(--white);
+    cursor: pointer;
+}
+.bar {
+    height: 0.4rem;
+    border: 1px solid var(--black);
+}
+.body {
+    display: flex;
+    flex-direction: row;
+}
+.sidebar {
+    height: 86.2vh;
+    width: 14rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    background-color: var(--yellow);
+}
+.sidebar-add {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+}
+.sidebar-add-txt-add {
+    color: var(--white);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.body-right {
+    background-color: var(--blue);
+    width: 82rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.body-right-main {
+    width: 60rem;
+    background-color: var(--yellow);
+    border: 1px solid black;
+    border-radius: 1rem;
+}
+.body-right-toptxt {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--white);
+    padding: 1rem 0 1rem 1rem;
+}
+.body-right-stdinf {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 0 2rem 1rem;
+}
+.body-right-stdinf-dtl-name-first {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.field-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.body-right-stdinf-dtl-input, .body-right-stdinf-dtl-textarea {
+    width: 15rem;
+    margin-left: 1rem;
+    padding: 0.5rem;
+}
+.body-right-stdinf-dtl-textarea {
+    height: 5rem;
+}
+.body-right-stdinf-end {
+    display: flex;
+    justify-content: end;
+    gap: 2rem;
+    padding: 0 2rem 1rem 0;
+}
+.body-right-stdinf-end-txtone {
+    width: 3rem;
+    background-color: var(--blue);
+    text-align: center;
+    color: var(--white);
+    border-radius: 5px;
+    cursor: pointer;
+}
+.body-right-stdinf-end-txttwo {
+    width: 4rem;
+    background-color: var(--blue);
+    text-align: center;
+    color: var(--white);
+    border-radius: 5px;
+    cursor: pointer;
+}

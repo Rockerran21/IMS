@@ -156,3 +156,43 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+/* Additional styles for image upload */
+.body-right-stdinf-img {
+  position: relative;
+  cursor: pointer;
+}
+
+#profile-pic {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.body-right-stdinf-browse {
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.body-right-stdinf-img:hover .body-right-stdinf-browse {
+  display: block;
+}
+
+.body-right-current {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem 2rem 1rem; /* Adjust padding to align with other fields */
+}
+.body-right-stdinf-dtl-name-first {
+  display: flex;
+  gap: 1rem;
+}
