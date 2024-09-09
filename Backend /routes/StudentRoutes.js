@@ -1,39 +1,32 @@
+// routes/StudentRoutes.js
+
 const express = require('express');
-const Student = require('../models/student');
 const router = express.Router();
+const mongoose = require('mongoose');
+const Student = require('../models/student');
+const upload = require('../models/photos'); // GridFS and multer configuration for file upload
 
-// Get all students
-router.get('/', async (req, res) => {
+// Add a new student with photo upload
+router.post('/upload', upload.single('photo'), async (req, res) => {
     try {
-        const students = await Student.find();
-        res.json(students);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
+        const { firstName, lastName, graduationYear, jobRole, currentEmployer, skillsObtained } = req.body;
 
-// Add a student
-router.post('/', async (req, res) => {
-    const student = new Student({
-        StudentID: req.body.StudentID,
-        FirstName: req.body.FirstName,
-        LastName: req.body.LastName,
-        Email: req.body.Email,
-        CurrentEmployer: req.body.CurrentEmployer,
-        PastEmployer: req.body.PastEmployer,
-        CurrentField: req.body.CurrentField,
-        BachlorSubject: req.body.BachlorSubject,
-        HighSchoolGraduated: req.body.HighSchoolGraduated,
-        Grade10Schools: req.body.Grade10Schools,
-        FinalProject: req.body.FinalProject,
-        LinkedInProfile: req.body.LinkedInProfile
-    });
+        // Create student with photo linked by GridFS file id
+        const newStudent = new Student({
+            firstName,
+            lastName,
+            graduationYear,
+            jobRole,
+            currentEmployer,
+            skillsObtained: skillsObtained ? skillsObtained.split(',') : [],
+            photoId: req.file.id // Link to the uploaded photo's GridFS file ID
+        });
 
-    try {
-        const newStudent = await student.save();
-        res.status(201).json(newStudent);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+        await newStudent.save();
+        res.status(201).json({ message: 'Student created successfully', student: newStudent });
+    } catch (error) {
+        console.error('Error saving student:', error);
+        res.status(500).json({ error: 'Error saving student' });
     }
 });
 
