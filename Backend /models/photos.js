@@ -1,7 +1,7 @@
 const util = require('util');
 const crypto = require('crypto');
 const path = require('path');
-const GridFsStorage = require('multer-gridfs-storage');
+const { GridFsStorage } = require('multer-gridfs-storage');
 const multer = require('multer');
 
 // Load environment variables

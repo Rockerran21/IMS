@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const certificationSchema = new Schema({
-    CertificationID: { type: Number, required: true, unique: true },
-    CertificationName: { type: String, required: true },
-    IssuingAuthority: { type: String, required: true },
-    DateObtained: { type: Date, required: true },
-    StudentID: { type: Number, required: true }
+const certificationSchema = new mongoose.Schema({
+    certificationName: { type: String, required: true },
+    issuingAuthority: String,
+    dateObtained: Date,
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true }
 });
 
-const Certification = mongoose.model('Certification', certificationSchema);
-module.exports = Certification;
+module.exports = mongoose.model('Certification', certificationSchema);

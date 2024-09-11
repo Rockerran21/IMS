@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const projectSchema = new Schema({
-    ProjectID: { type: Number, required: true, unique: true },
-    ProjectName: { type: String, required: true },
-    Description: { type: String, required: true },
-    StudentID: { type: Number, required: true }
+const projectSchema = new mongoose.Schema({
+    projectName: { type: String, required: true },
+    description: String,
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true }
 });
 
-const Project = mongoose.model('Project', projectSchema);
-module.exports = Project;
+module.exports = mongoose.model('Project', projectSchema);

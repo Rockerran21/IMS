@@ -1,10 +1,16 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const skillSchema = new Schema({
-    SkillID: { type: Number, required: true, unique: true },
-    SkillName: { type: String, required: true }
+const skillSchema = new mongoose.Schema({
+    skillName: { type: String, required: true, unique: true },
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }] // Ensure this is an array of ObjectIds
 });
 
-const Skill = mongoose.model('Skill', skillSchema);
-module.exports = Skill;
+// Ensure students array is properly initialized
+skillSchema.pre('save', function (next) {
+    if (!this.students) {
+        this.students = [];
+    }
+    next();
+});
+
+module.exports = mongoose.model('Skill', skillSchema);

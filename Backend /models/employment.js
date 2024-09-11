@@ -1,15 +1,10 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const employmentSchema = new Schema({
-    EmploymentID: { type: Number, required: true, unique: true },
-    StudentID: { type: Number, required: true },
-    EmployerName: { type: String, required: true },
-    StartDate: { type: Date, required: true },
-    EndDate: { type: Date, required: true },
-    JobTitle: { type: String, required: true },
-    JobDescription: { type: String, required: true }
+const employmentSchema = new mongoose.Schema({
+    employerName: { type: String, required: true },
+    currentEmployer: { type: Boolean, default: false },
+    currentField: { type: String },
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true }
 });
 
-const Employment = mongoose.model('Employment', employmentSchema);
-module.exports = Employment;
+module.exports = mongoose.model('Employment', employmentSchema);
