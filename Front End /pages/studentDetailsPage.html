@@ -11,32 +11,30 @@
 <div id="particles-js"></div>
 
 <div class="container">
-    <aside class="sidebar">
+    <div class="sidebar">
         <div class="logo">
             <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
         </div>
-        <nav>
-            <ul>
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="searchStudentPage.html">Search Students</a></li>
-                <li><a href="add-student.html">Add New Student</a></li>
-                <li><a href="#">Update/Delete Records</a></li>
-                <li><a href="#">Analytics</a></li>
-                <li><a href="#">Settings</a></li>
-            </ul>
-        </nav>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="searchStudentPage.html">Search Students</a></li>
+            <li><a href="add-student.html">Add New Student</a></li>
+            <li><a href="searchStudentPage.html">Update/Delete Records</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
         <div class="bottom-nav">
-            <a href="#">Profile</a>
-            <a href="#" id="logoutBtn">Logout</a>
+            <a href="profile.html" class="profile-btn">Profile</a>
+            <a href="logout.html" id="logoutBtn" class="logout-btn">Logout</a>
         </div>
-    </aside>
+    </div>
 
-    <main class="content">
-        <h1 class="page-title">Student Details</h1>
+    <div class="content" role="main">
+        <h1 id="student-details" class="page-title">Student Details</h1>
 
         <div class="student-profile">
             <div class="profile-header">
-                <img src="" alt="Student Photo" id="studentPhoto" class="profile-photo">
+                <img id="studentPhoto" class="profile-photo" alt="Student Photo">
                 <div class="profile-info">
                     <h2 id="studentName"></h2>
                     <p id="studentEmail"></p>
@@ -45,39 +43,40 @@
             </div>
 
             <div class="profile-sections">
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Personal Information</h3>
                     <div id="personalInfo"></div>
-                </section>
+                </div>
 
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Academic Information</h3>
                     <div id="academicInfo"></div>
-                </section>
+                </div>
 
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Skills</h3>
                     <div id="skills"></div>
-                </section>
+                </div>
 
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Certifications</h3>
                     <div id="certifications"></div>
-                </section>
+                </div>
 
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Employment History</h3>
                     <div id="employments"></div>
-                </section>
+                </div>
 
-                <section class="profile-section">
+                <div class="section profile-section">
                     <h3>Projects</h3>
-                    <div id="projects"></div>
-                </section>
+                    <div id="projectsContainer"></div>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 </div>
+
 <div id="loadingAnimation" class="loading-animation" style="display: none;">
     <div class="spinner"></div>
     <p>Loading...</p>

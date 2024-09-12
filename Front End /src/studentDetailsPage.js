@@ -40,20 +40,17 @@ function fetchStudentDetails(studentId) {
         `;
         });
 }
-
 function displayStudentDetails(student) {
     document.getElementById('studentName').textContent = `${student.firstName} ${student.lastName}`;
     document.getElementById('studentEmail').textContent = student.email;
-    document.getElementById('studentDepartment').textContent = student.bachelorSubject;
+    document.getElementById('studentDepartment').textContent = student.bachelorSubject || 'N/A';
 
     const studentPhoto = document.getElementById('studentPhoto');
     studentPhoto.src = `http://localhost:8080/api/students/${student._id}/photo`;
     studentPhoto.alt = `${student.firstName} ${student.lastName}'s photo`;
     studentPhoto.onerror = function() {
-        this.src = 'https://media.istockphoto.com/id/610003972/vector/vector-businessman-black-silhouette-isolated.jpg?s=612x612&w=0&k=20&c=Iu6j0zFZBkswfq8VLVW8XmTLLxTLM63bfvI6uXdkacM=';
+        this.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgB730p0ChSl_CNr5N6n05AGzEtEAhFypOFg&s';
     };
-
-    console.log('Student data:', student);
 
     displayPersonalInfo(student);
     displayAcademicInfo(student);
@@ -75,9 +72,9 @@ function displayPersonalInfo(student) {
 function displayAcademicInfo(student) {
     const academicInfo = document.getElementById('academicInfo');
     academicInfo.innerHTML = `
-        <div class="info-item"><strong>Bachelor Subject:</strong> ${student.bachelorSubject}</div>
-        <div class="info-item"><strong>High School:</strong> ${student.highSchool}</div>
-        <div class="info-item"><strong>Grade 10 School:</strong> ${student.grade10School}</div>
+        <div class="info-item"><strong>Bachelor Subject:</strong> ${student.bachelorSubject || 'N/A'}</div>
+        <div class="info-item"><strong>High School:</strong> ${student.highSchool || 'N/A'}</div>
+        <div class="info-item"><strong>Grade 10 School:</strong> ${student.grade10School || 'N/A'}</div>
     `;
 }
 
@@ -97,7 +94,7 @@ function displayCertifications(certifications) {
         const certificationsHtml = certifications.map(cert => `
             <div class="certification-item">
                 <span class="certification-tag">${cert.certificationName}</span>
-                <div><strong>Issuer:</strong> ${cert.issuingOrganization}</div>
+                <div><strong>Issuer:</strong> ${cert.issuingAuthority}</div>
                 <div><strong>Date:</strong> ${new Date(cert.dateObtained).toLocaleDateString()}</div>
             </div>
         `).join('');
@@ -112,9 +109,8 @@ function displayEmployments(employments) {
     if (employments && employments.length > 0) {
         const employmentsHtml = employments.map(emp => `
             <div class="employment-item">
-                <h4>${emp.jobTitle} at ${emp.companyName}</h4>
-                <div><strong>Duration:</strong> ${new Date(emp.startDate).toLocaleDateString()} - ${emp.endDate ? new Date(emp.endDate).toLocaleDateString() : 'Present'}</div>
-                <div><strong>Description:</strong> ${emp.jobDescription}</div>
+                <h4>${emp.currentField || 'N/A'} at ${emp.employerName}</h4>
+                <div><strong>Current Employer:</strong> ${emp.currentEmployer ? 'Yes' : 'No'}</div>
             </div>
         `).join('');
         employmentsContainer.innerHTML = employmentsHtml;
@@ -124,18 +120,16 @@ function displayEmployments(employments) {
 }
 
 function displayProjects(projects) {
-    const projectsContainer = document.getElementById('projects');
+    const projectsContainer = document.getElementById('projectsContainer');
     if (projects && projects.length > 0) {
-        const projectsHtml = projects.map(project => `
+        const projectsList = projects.map(project => `
             <div class="project-item">
                 <h4>${project.projectName}</h4>
-                <div><strong>Description:</strong> ${project.projectDescription}</div>
-                <div><strong>Technologies:</strong> ${project.technologiesUsed.join(', ')}</div>
-                <div><strong>Duration:</strong> ${new Date(project.startDate).toLocaleDateString()} - ${project.endDate ? new Date(project.endDate).toLocaleDateString() : 'Ongoing'}</div>
+                <p>${project.description || 'No description available.'}</p>
             </div>
         `).join('');
-        projectsContainer.innerHTML = projectsHtml;
+        projectsContainer.innerHTML = projectsList;
     } else {
-        projectsContainer.innerHTML = '<p>No projects listed.</p>';
+        projectsContainer.innerHTML = '<p>No projects available.</p>';
     }
 }

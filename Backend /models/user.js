@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true, unique: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
-    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' }
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
 });
 
 userSchema.pre('save', async function(next) {

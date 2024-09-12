@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Forbes College IMS</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="logo">
+            <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="searchStudentPage.html">Search Students</a></li>
+            <li><a href="add-student.html">Add New Student</a></li>
+            <li><a href="updatedeletePage.html">Update/Delete Records</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html" class="active">Settings</a></li>
+        </ul>
+        <div class="bottom-nav">
+            <a href="profile.html" class="profile-btn">Profile</a>
+            <a href="logout.html" id="logoutBtn" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1 class="page-title">Admin Settings</h1>
+
+        <div class="settings-grid">
+            <div class="settings-card">
+                <h2><i class="fas fa-user-shield"></i> User Management</h2>
+                <button id="manageUsersBtn" class="settings-btn">Manage Users</button>
+            </div>
+            <div class="settings-card">
+                <h2><i class="fas fa-database"></i> Database Settings</h2>
+                <button id="backupDbBtn" class="settings-btn">Backup Database</button>
+                <button id="restoreDbBtn" class="settings-btn">Restore Database</button>
+            </div>
+            <div class="settings-card">
+                <h2><i class="fas fa-envelope"></i> Email Settings</h2>
+                <button id="configEmailBtn" class="settings-btn">Configure Email</button>
+            </div>
+            <div class="settings-card">
+                <h2><i class="fas fa-lock"></i> Security Settings</h2>
+                <button id="changePasswordBtn" class="settings-btn">Change Admin Password</button>
+                <button id="twoFactorAuthBtn" class="settings-btn">Configure Two-Factor Auth</button>
+            </div>
+            <div class="settings-card">
+                <h2><i class="fas fa-cog"></i> System Settings</h2>
+                <button id="systemConfigBtn" class="settings-btn">System Configuration</button>
+            </div>
+            <div class="settings-card">
+                <h2><i class="fas fa-history"></i> Logs</h2>
+                <button id="viewLogsBtn" class="settings-btn">View System Logs</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="../src/settings.js"></script>
+<script src="../src/global.js"></script>
+</body>
+</html>

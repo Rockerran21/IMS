@@ -162,12 +162,13 @@ exports.deleteStudent = async (req, res) => {
         await Project.deleteMany({ studentId: student._id }).session(session);
         await Skill.updateMany({ students: student._id }, { $pull: { students: student._id } }).session(session);
 
-        await student.remove({ session });
+        await Student.deleteOne({ _id: student._id }).session(session);
         await session.commitTransaction();
 
         res.json({ message: 'Student deleted successfully' });
     } catch (err) {
         await session.abortTransaction();
+        console.error('Error in deleteStudent:', err);
         res.status(500).json({ message: err.message });
     } finally {
         session.endSession();

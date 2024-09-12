@@ -42,8 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageDiv.textContent = 'Login successful!';
                 messageDiv.style.color = 'green';
                 localStorage.setItem('token', data.token);
-                // Redirect to dashboard or home page
-                // window.location.href = '/dashboard';
+                localStorage.setItem('userRole', data.user.role); // Store user role
+
+                // Redirect based on user role
+                if (data.user.role === 'admin') {
+                    window.location.href = '../pages/dashboard.html';
+                } else {
+                    // Redirect non-admin users to a different page
+                    window.location.href = '../pages/user-dashboard.html'; // Create this page for regular users
+                }
             } else {
                 throw new Error(data.message || 'Login failed');
             }
