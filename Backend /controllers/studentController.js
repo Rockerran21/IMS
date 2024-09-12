@@ -15,13 +15,24 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id).populate('certifications employments projects skills');
+        const student = await Student.findById(req.params.id)
+            .populate('certifications')
+            .populate('employments')
+            .populate('projects')
+            .populate('skills');
+
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
-        res.json(student);
+
+
+        const studentWithoutPhoto = student.toObject();
+        delete studentWithoutPhoto.profilePhoto;
+
+        res.json(studentWithoutPhoto);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error('Error in getStudentById:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -30,6 +41,7 @@ exports.createStudent = async (req, res) => {
     session.startTransaction();
 
     try {
+        console.log('Received student data:', JSON.stringify(req.body, null, 2));
         console.log('Received full student data:', JSON.stringify(req.body, null, 2));
         const { certifications, employments, projects, ...studentData } = req.body;
 
@@ -65,8 +77,10 @@ exports.createStudent = async (req, res) => {
     } catch (err) {
         await session.abortTransaction();
         console.error('Error in createStudent:', err);
-        console.error('Error stack:', err.stack);
-        res.status(400).json({ message: err.message, stack: err.stack });
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ message: err.message, errors: err.errors });
+        }
+        res.status(500).json({ message: 'Internal server error' });
     } finally {
         session.endSession();
     }
@@ -383,6 +397,66 @@ exports.createStudent = async (req, res) => {
     }
 };
 
+exports.searchStudents = async (req, res) => {
+    try {
+        const { query, department, semester, admissionDate, skills } = req.query;
+
+        let searchCriteria = {};
+
+        if (query) {
+            // Split the query into words
+            const queryWords = query.split(' ').filter(word => word.length > 0);
+
+            // Create an array of conditions for each word
+            const nameConditions = queryWords.map(word => ({
+                $or: [
+                    { firstName: { $regex: word, $options: 'i' } },
+                    { lastName: { $regex: word, $options: 'i' } }
+                ]
+            }));
+
+            // Add email condition
+            searchCriteria.$or = [
+                { $and: nameConditions },
+                { email: { $regex: query, $options: 'i' } }
+            ];
+        }
+
+        if (department) {
+            searchCriteria.bachelorSubject = department;
+        }
+
+        if (semester) {
+            searchCriteria.semester = parseInt(semester);
+        }
+
+        if (admissionDate) {
+            searchCriteria.admissionDate = admissionDate;
+        }
+
+        if (skills) {
+            const skillsArray = skills.split(',').map(skill => skill.trim());
+            searchCriteria.skills = { $in: skillsArray };
+        }
+
+        console.log('Search criteria:', JSON.stringify(searchCriteria, null, 2));
+
+        const students = await Student.find(searchCriteria)
+            .populate('certifications')
+            .populate('employments')
+            .populate('projects')
+            .populate('skills')
+            .limit(20);
+
+        console.log(`Found ${students.length} students`);
+
+        res.json(students);
+    } catch (err) {
+        console.error('Error in searchStudents:', err);
+        res.status(500).json({ message: err.message });
+    }
+};
+
 // New method to handle photo uploads
 exports.uploadPhoto = async (req, res) => {
     try {
@@ -403,7 +477,21 @@ exports.uploadPhoto = async (req, res) => {
         await student.save();
         res.status(200).json({ message: 'Photo uploaded successfully' });
     } catch (err) {
+        console.error('Error uploading photo:', err);
         res.status(500).json({ message: err.message });
+    }
+};
+exports.getStudentPhoto = async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+        if (!student || !student.profilePhoto || !student.profilePhoto.data) {
+            return res.status(404).send('No photo found');
+        }
+        res.set('Content-Type', student.profilePhoto.contentType);
+        res.send(student.profilePhoto.data);
+    } catch (err) {
+        console.error('Error in getStudentPhoto:', err);
+        res.status(500).send('Server error');
     }
 };
 

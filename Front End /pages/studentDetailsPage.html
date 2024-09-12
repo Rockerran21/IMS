@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details - Forbes College IMS</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/studentDetailsPage.css">
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="container">
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="searchStudentPage.html">Search Students</a></li>
+                <li><a href="add-student.html">Add New Student</a></li>
+                <li><a href="#">Update/Delete Records</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+        </nav>
+        <div class="bottom-nav">
+            <a href="#">Profile</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+    </aside>
+
+    <main class="content">
+        <h1 class="page-title">Student Details</h1>
+
+        <div class="student-profile">
+            <div class="profile-header">
+                <img src="" alt="Student Photo" id="studentPhoto" class="profile-photo">
+                <div class="profile-info">
+                    <h2 id="studentName"></h2>
+                    <p id="studentEmail"></p>
+                    <p id="studentDepartment"></p>
+                </div>
+            </div>
+
+            <div class="profile-sections">
+                <section class="profile-section">
+                    <h3>Personal Information</h3>
+                    <div id="personalInfo"></div>
+                </section>
+
+                <section class="profile-section">
+                    <h3>Academic Information</h3>
+                    <div id="academicInfo"></div>
+                </section>
+
+                <section class="profile-section">
+                    <h3>Skills</h3>
+                    <div id="skills"></div>
+                </section>
+
+                <section class="profile-section">
+                    <h3>Certifications</h3>
+                    <div id="certifications"></div>
+                </section>
+
+                <section class="profile-section">
+                    <h3>Employment History</h3>
+                    <div id="employments"></div>
+                </section>
+
+                <section class="profile-section">
+                    <h3>Projects</h3>
+                    <div id="projects"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+<div id="loadingAnimation" class="loading-animation" style="display: none;">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+</div>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="../src/global.js"></script>
+<script src="../src/studentDetailsPage.js"></script>
+</body>
+</html>

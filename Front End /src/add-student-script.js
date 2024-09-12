@@ -252,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     photoURL = photoResult.photoUrl;  // Assuming your API returns the photo URL
                 }
             }
+            console.log('Sending student data:', JSON.stringify(studentData, null, 2));
 
             // Hide the form and display the success message
             form.style.display = 'none';

@@ -10,7 +10,6 @@ const auth = async (req, res, next) => {
         if (!user) {
             throw new Error();
         }
-
         req.token = token;
         req.user = user;
         next();
@@ -34,14 +33,11 @@ const checkRole = (roles) => {
         next();
     };
 };
-
 const errorHandler = (err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send({ error: 'Something went wrong!' });
 };
-
 const notFound = (req, res, next) => {
     res.status(404).send({ error: 'Route not found' });
 };
-
 module.exports = { auth, adminOnly, checkRole, errorHandler, notFound };

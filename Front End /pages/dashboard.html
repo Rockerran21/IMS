@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Forbes College</title>
+    <title>Forbes College Admin Dashboard</title>
     <link rel="stylesheet" href="../styles/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
 </head>
 <body>
 <div id="particles-js"></div>
@@ -22,7 +21,7 @@
         </div>
         <ul>
             <li><a href="#" class="active">Dashboard</a></li>
-            <li><a href="#">Search Students</a></li>
+            <li><a href="searchStudentPage.html">Search Students</a></li>
             <li><a href="add-student.html">Add New Student</a></li>
             <li><a href="#">Update/Delete Records</a></li>
             <li><a href="#">Analytics</a></li>
@@ -35,36 +34,56 @@
     </nav>
 
     <main class="content" role="main">
-        <h1 class="welcome-text">Forbes College Admin Dashboard</h1>
+        <h1 id="forbes-college-admin-dashboard" class="welcome-text">Forbes College Admin Dashboard</h1>
 
         <div class="dashboard-summary">
             <div id="total-students" class="summary-card">
-                <h2>Total Students</h2>
+                <h2>Total Active Students</h2>
                 <p>Loading...</p>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
             </div>
             <div id="total-faculty" class="summary-card">
                 <h2>Total Faculty</h2>
                 <p>Loading...</p>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
             </div>
             <div id="courses-offered" class="summary-card">
                 <h2>Courses Offered</h2>
                 <p>Loading...</p>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
             </div>
         </div>
 
         <div class="dashboard-charts">
             <div class="chart-container">
                 <canvas id="department-chart"></canvas>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
             </div>
             <div class="chart-container">
                 <canvas id="gender-chart"></canvas>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
             </div>
         </div>
 
-        <div id="calendar"></div>
+        <div class="dashboard-charts">
+            <div class="chart-container">
+                <canvas id="enrollment-trend-chart"></canvas>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
+            </div>
+        </div>
+
+        <div class="dashboard-bottom">
+            <div id="calendar"></div>
+            <div id="upcoming-events">
+                <h2>Upcoming Events</h2>
+                <ul id="events-list"></ul>
+                <div class="loading-indicator" style="display: none;">Loading...</div>
+            </div>
+        </div>
     </main>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 <script src="../src/adminDashboard.js"></script>
 </body>
 </html>
