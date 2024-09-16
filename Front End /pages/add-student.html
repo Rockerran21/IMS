@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Student - Forbes College</title>
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/add-student-styles.css">
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
 <div id="particles-js"></div>
@@ -45,28 +46,46 @@
 
                 <div id="basic" class="tab-content active">
                     <div class="form-group">
-                        <input type="text" id="firstName" name="firstName" required>
+                        <input type="text" id="firstName" name="firstName" required placeholder=" ">
                         <label for="firstName">First Name</label>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="lastName" name="lastName" required>
+                        <input type="text" id="lastName" name="lastName" required placeholder=" ">
                         <label for="lastName">Last Name</label>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" required placeholder=" ">
                         <label for="email">Email</label>
                     </div>
                     <div class="form-group">
                         <select id="bachelorSubject" name="bachelorSubject" required>
-                            <option value="">Select Subject</option>
+                            <option value="" disabled selected hidden></option>
                             <option value="BCS">BCS</option>
                             <option value="BHM">BHM</option>
                             <option value="BBA">BBA</option>
                         </select>
                         <label for="bachelorSubject">Bachelor Subject</label>
                     </div>
+                    <!-- New fields -->
+                    <div class="form-group">
+                        <input type="text" id="dateOfEnrollment" name="dateOfEnrollment" class="date-picker" required>
+                        <label for="dateOfEnrollment">Date of Enrollment</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="currentSemester" name="currentSemester" min="1" max="8" required>
+                        <label for="currentSemester">Current Semester</label>
+                    </div>
+                    <div class="form-group">
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected hidden></option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                        <label for="gender">Gender</label>
+                    </div>
                 </div>
 
+                <!-- Education Tab -->
                 <div id="education" class="tab-content">
                     <div class="form-group">
                         <input type="text" id="highSchool" name="highSchool">
@@ -78,21 +97,25 @@
                     </div>
                 </div>
 
+                <!-- Certifications Tab -->
                 <div id="certifications" class="tab-content">
                     <div id="certificationsContainer"></div>
                     <button type="button" id="addCertification" class="add-button">Add Certification</button>
                 </div>
 
+                <!-- Employment Tab -->
                 <div id="employments" class="tab-content">
                     <div id="employmentsContainer"></div>
                     <button type="button" id="addEmployment" class="add-button">Add Employment</button>
                 </div>
 
+                <!-- Projects Tab -->
                 <div id="projects" class="tab-content">
                     <div id="projectsContainer"></div>
                     <button type="button" id="addProject" class="add-button">Add Project</button>
                 </div>
 
+                <!-- Photo Tab -->
                 <div id="photo" class="tab-content">
                     <div class="form-group file-upload">
                         <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*" style="display: none;">
@@ -116,7 +139,20 @@
     <p>Adding student...</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span id="closeModalBtn" class="close-button">&times;</span>
+        <h2>Congratulations, <span id="studentNamePlaceholder"></span>!</h2>
+        <p>The student has been added successfully.</p>
+        <div id="studentPhotoPreview"></div>
+        <button id="modalOkBtn" class="btn primary">OK</button>
+    </div>
+</div>
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="../src/global.js"></script>
 <script src="../src/add-student-script.js"></script>
 </body>

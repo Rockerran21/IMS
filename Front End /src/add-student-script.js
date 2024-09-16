@@ -1,24 +1,27 @@
-function initializePhotoUpload() {
-    const uploadBtn = document.getElementById('uploadPhotoBtn');
-    const fileInput = document.getElementById('profilePhoto');
-
-    if (uploadBtn && fileInput) {
-        uploadBtn.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', handlePhotoUpload);
-    } else {
-        console.error('Upload button or file input not found');
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     initializeTabs();
     initializeForm();
     initializeDynamicFields();
     initializePhotoUpload();
+    initializeSelectFields();
+    initializeDatePickers();
 });
+
+function initializeDatePickers() {
+    flatpickr('.date-picker', {
+        dateFormat: 'Y-m-d',
+    });
+}
+
+function initializeForm() {
+    const form = document.getElementById('addStudentForm');
+    form.addEventListener('submit', handleSubmit);
+
+    const photoInput = document.getElementById('profilePhoto');
+    photoInput.addEventListener('change', handlePhotoUpload);
+
+    initializeSelectFields();
+}
 
 function initializeTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
@@ -63,14 +66,6 @@ function initializeTabs() {
     showTab(currentTab);
 }
 
-function initializeForm() {
-    const form = document.getElementById('addStudentForm');
-    form.addEventListener('submit', handleSubmit);
-
-    const photoInput = document.getElementById('profilePhoto');
-    photoInput.addEventListener('change', handlePhotoUpload);
-}
-
 function initializeDynamicFields() {
     document.getElementById('addCertification').addEventListener('click', () => addDynamicField('certifications'));
     document.getElementById('addEmployment').addEventListener('click', () => addDynamicField('employments'));
@@ -87,15 +82,15 @@ function addDynamicField(type) {
             html = `
                 <div class="certification-item">
                     <div class="form-group">
-                        <input type="text" name="${type}[${index}].certificationName" required>
+                        <input type="text" name="${type}[${index}][certificationName]" required>
                         <label>Certification Name</label>
                     </div>
                     <div class="form-group">
-                        <input type="text" name="${type}[${index}].issuingAuthority">
+                        <input type="text" name="${type}[${index}][issuingAuthority]" required>
                         <label>Issuing Authority</label>
                     </div>
                     <div class="form-group">
-                        <input type="date" name="${type}[${index}].dateObtained">
+                        <input type="text" name="${type}[${index}][dateObtained]" class="date-picker" required>
                         <label>Date Obtained</label>
                     </div>
                 </div>
@@ -105,16 +100,20 @@ function addDynamicField(type) {
             html = `
                 <div class="employment-item">
                     <div class="form-group">
-                        <input type="text" name="${type}[${index}].employerName" required>
+                        <input type="text" name="${type}[${index}][employerName]" required placeholder=" ">
                         <label>Employer Name</label>
                     </div>
                     <div class="form-group">
-                        <input type="checkbox" name="${type}[${index}].currentEmployer">
-                        <label>Current Employer</label>
+                        <input type="text" name="${type}[${index}][title]" required placeholder=" ">
+                        <label>Title</label>
                     </div>
                     <div class="form-group">
-                        <input type="text" name="${type}[${index}].currentField">
-                        <label>Current Field</label>
+                        <select name="${type}[${index}][currentlyEmployed]" required>
+                            <option value="" disabled selected hidden></option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <label>Currently Employed</label>
                     </div>
                 </div>
             `;
@@ -123,11 +122,11 @@ function addDynamicField(type) {
             html = `
                 <div class="project-item">
                     <div class="form-group">
-                        <input type="text" name="${type}[${index}].projectName" required>
+                        <input type="text" name="${type}[${index}][projectName]" required>
                         <label>Project Name</label>
                     </div>
                     <div class="form-group">
-                        <textarea name="${type}[${index}].description"></textarea>
+                        <textarea name="${type}[${index}][description]" required></textarea>
                         <label>Description</label>
                     </div>
                 </div>
@@ -136,6 +135,12 @@ function addDynamicField(type) {
     }
 
     container.insertAdjacentHTML('beforeend', html);
+
+    if (type === 'certifications') {
+        flatpickr(container.querySelectorAll('.date-picker'), {
+            dateFormat: 'Y-m-d',
+        });
+    }
 }
 
 async function handleSubmit(e) {
@@ -147,7 +152,10 @@ async function handleSubmit(e) {
         firstName: formData.get('firstName'),
         lastName: formData.get('lastName'),
         email: formData.get('email'),
+        gender: formData.get('gender'),
         bachelorSubject: formData.get('bachelorSubject'),
+        dateOfEnrollment: formData.get('dateOfEnrollment'),
+        currentSemester: formData.get('currentSemester'),
         highSchool: formData.get('highSchool'),
         grade10School: formData.get('grade10School'),
         certifications: [],
@@ -155,28 +163,42 @@ async function handleSubmit(e) {
         projects: []
     };
 
-    // Process certifications
-    const certifications = formData.getAll('certifications[0].certificationName').map((_, index) => ({
-        certificationName: formData.get(`certifications[${index}].certificationName`),
-        issuingAuthority: formData.get(`certifications[${index}].issuingAuthority`),
-        dateObtained: formData.get(`certifications[${index}].dateObtained`)
-    })).filter(cert => cert.certificationName);
-    studentData.certifications = certifications;
+    const certificationItems = document.querySelectorAll('.certification-item');
+    certificationItems.forEach((item, index) => {
+        const certificationName = formData.get(`certifications[${index}][certificationName]`);
+        if (certificationName) {
+            studentData.certifications.push({
+                certificationName: certificationName,
+                issuingAuthority: formData.get(`certifications[${index}][issuingAuthority]`),
+                dateObtained: formData.get(`certifications[${index}][dateObtained]`)
+            });
+        }
+    });
 
-    // Process employments
-    const employments = formData.getAll('employments[0].employerName').map((_, index) => ({
-        employerName: formData.get(`employments[${index}].employerName`),
-        currentEmployer: formData.get(`employments[${index}].currentEmployer`) === 'on',
-        currentField: formData.get(`employments[${index}].currentField`)
-    })).filter(emp => emp.employerName);
-    studentData.employments = employments;
+    const employmentItems = document.querySelectorAll('.employment-item');
+    employmentItems.forEach((item, index) => {
+        const employerName = formData.get(`employments[${index}][employerName]`);
+        if (employerName) {
+            studentData.employments.push({
+                employerName: employerName,
+                title: formData.get(`employments[${index}][title]`),
+                currentEmployer: formData.get(`employments[${index}][currentEmployer]`) === 'on'
+            });
+        }
+    });
 
-    // Process projects
-    const projects = formData.getAll('projects[0].projectName').map((_, index) => ({
-        projectName: formData.get(`projects[${index}].projectName`),
-        description: formData.get(`projects[${index}].description`)
-    })).filter(proj => proj.projectName);
-    studentData.projects = projects;
+    const projectItems = document.querySelectorAll('.project-item');
+    projectItems.forEach((item, index) => {
+        const projectName = formData.get(`projects[${index}][projectName]`);
+        if (projectName) {
+            studentData.projects.push({
+                projectName: projectName,
+                description: formData.get(`projects[${index}][description]`)
+            });
+        }
+    });
+
+    console.log('Submitting student data:', studentData);
 
     try {
         const token = localStorage.getItem('token');
@@ -184,7 +206,6 @@ async function handleSubmit(e) {
             throw new Error('No authentication token found. Please log in.');
         }
 
-        // First, create the student
         const response = await fetch('http://localhost:8080/api/students', {
             method: 'POST',
             headers: {
@@ -201,7 +222,6 @@ async function handleSubmit(e) {
 
         const result = await response.json();
 
-        // Now, upload the photo if one was selected
         const photoFile = formData.get('profilePhoto');
         if (photoFile && photoFile.size > 0) {
             const photoFormData = new FormData();
@@ -221,10 +241,10 @@ async function handleSubmit(e) {
             }
         }
 
-        alert('Student added successfully!');
+        showSuccessModal(studentData.firstName, photoFile);
+
         e.target.reset();
         document.getElementById('photoPreview').innerHTML = '';
-        // Reset dynamic fields
         ['certificationsContainer', 'employmentsContainer', 'projectsContainer'].forEach(containerId => {
             document.getElementById(containerId).innerHTML = '';
         });
@@ -233,6 +253,29 @@ async function handleSubmit(e) {
         alert(error.message || 'Failed to add student. Please try again.');
     } finally {
         hideLoadingAnimation();
+    }
+}
+
+function showLoadingAnimation() {
+    document.getElementById('loadingAnimation').style.display = 'flex';
+}
+
+function hideLoadingAnimation() {
+    document.getElementById('loadingAnimation').style.display = 'none';
+}
+
+function initializePhotoUpload() {
+    const uploadBtn = document.getElementById('uploadPhotoBtn');
+    const fileInput = document.getElementById('profilePhoto');
+
+    if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', handlePhotoUpload);
+    } else {
+        console.error('Upload button or file input not found');
     }
 }
 
@@ -254,10 +297,57 @@ function handlePhotoUpload(event) {
     }
 }
 
-function showLoadingAnimation() {
-    document.getElementById('loadingAnimation').style.display = 'flex';
+function initializeSelectFields() {
+    const selectElements = document.querySelectorAll('.form-group select');
+    selectElements.forEach(select => {
+        const parentFormGroup = select.parentElement;
+        const checkValue = () => {
+            if (select.value && select.value !== '') {
+                parentFormGroup.classList.add('select-filled');
+            } else {
+                parentFormGroup.classList.remove('select-filled');
+            }
+        };
+        select.addEventListener('change', checkValue);
+        checkValue();
+    });
 }
 
-function hideLoadingAnimation() {
-    document.getElementById('loadingAnimation').style.display = 'none';
+function showSuccessModal(studentName, photoFile) {
+    const modal = document.getElementById('successModal');
+    const studentNamePlaceholder = document.getElementById('studentNamePlaceholder');
+    const studentPhotoPreview = document.getElementById('studentPhotoPreview');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalOkBtn = document.getElementById('modalOkBtn');
+
+    studentNamePlaceholder.textContent = studentName;
+
+    if (photoFile && photoFile.size > 0) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            studentPhotoPreview.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            studentPhotoPreview.appendChild(img);
+        }
+        reader.readAsDataURL(photoFile);
+    } else {
+        studentPhotoPreview.innerHTML = '<p>No photo available.</p>';
+    }
+
+    modal.style.display = 'block';
+
+    const closeModal = () => {
+        modal.style.display = 'none';
+        studentPhotoPreview.innerHTML = '';
+    };
+
+    closeModalBtn.onclick = closeModal;
+    modalOkBtn.onclick = closeModal;
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    };
 }

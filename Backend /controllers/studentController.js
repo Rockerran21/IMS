@@ -42,10 +42,12 @@ exports.createStudent = async (req, res) => {
 
     try {
         console.log('Received student data:', JSON.stringify(req.body, null, 2));
-        console.log('Received full student data:', JSON.stringify(req.body, null, 2));
-        const { certifications, employments, projects, ...studentData } = req.body;
+        const { certifications, employments, projects, skills, ...studentData } = req.body;
 
-        console.log('Creating new student with data:', JSON.stringify(studentData, null, 2));
+        if (studentData.dateOfEnrollment) {
+            studentData.dateOfEnrollment = new Date(studentData.dateOfEnrollment);
+        }
+
         const student = new Student(studentData);
         await student.save({ session });
 
@@ -67,7 +69,19 @@ exports.createStudent = async (req, res) => {
             student.projects = projDocs.map(doc => doc._id);
         }
 
-        console.log('Saving student with updated data:', JSON.stringify(student, null, 2));
+        if (skills) {
+            const skillDocs = await Promise.all(skills.map(async (skillName) => {
+                let skill = await Skill.findOne({ skillName });
+                if (!skill) {
+                    skill = await Skill.create([{ skillName }], { session });
+                }
+                skill.students.push(student._id);
+                await skill.save({ session });
+                return skill._id;
+            }));
+            student.skills = skillDocs;
+        }
+
         await student.save({ session });
         await session.commitTransaction();
 
