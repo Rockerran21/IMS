@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/studentController');
+const dashboardController = require('../controllers/dashboardController'); // Add this line
 const { auth, adminOnly } = require('../middleware/auth');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+
 
 // CRUD Operations
 router.get('/search', auth, studentController.searchStudents);
@@ -26,6 +28,7 @@ router.post('/:id/certifications', auth, studentController.addStudentCertificati
 router.post('/:id/employments', auth, studentController.addStudentEmployment);
 router.post('/:id/projects', auth, studentController.addStudentProject);
 router.post('/:id/skills', auth, studentController.addStudentSkill);
+router.get('/dashboard-data', auth, adminOnly, dashboardController.getDashboardData);
 
 // Photo upload
 router.post('/:id/photo', auth, upload.single('photoUpload'), studentController.uploadPhoto);

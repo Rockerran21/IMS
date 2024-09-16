@@ -7,4 +7,6 @@ const certificationSchema = new mongoose.Schema({
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true }
 });
 
-module.exports = mongoose.model('Certification', certificationSchema);
+const Certification = mongoose.models.Certification || mongoose.model('Certification', certificationSchema);
+
+module.exports = Certification;

@@ -16,8 +16,5 @@ const studentSchema = new mongoose.Schema({
         contentType: String
     }
 });
-if (mongoose.models.Student) {
-    module.exports = mongoose.model('Student');
-} else {
-    module.exports = mongoose.model('Student', studentSchema);
-}
+const Student = mongoose.models.Student || mongoose.model('Student', studentSchema);
+module.exports = Student;

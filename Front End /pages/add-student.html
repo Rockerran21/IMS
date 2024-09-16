@@ -3,153 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Student - Forbes College IMS</title>
+    <title>Add New Student - Forbes College</title>
+    <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/add-student-styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
 <div id="particles-js"></div>
 
 <div class="container">
-    <button id="sidebarToggle" class="sidebar-toggle">☰</button>
-
     <div class="sidebar">
         <div class="logo">
             <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
         </div>
         <ul>
-            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="searchStudentPage.html"><i class="fas fa-search"></i> Search Students</a></li>
-            <li><a href="#" class="active"><i class="fas fa-user-plus"></i> Add New Student</a></li>
-            <li><a href="updatedeletePage.html"><i class="fas fa-edit"></i> Update/Delete Records</a></li>
-            <li><a href="analytics.html"><i class="fas fa-chart-bar"></i> Analytics</a></li>
-            <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="searchStudentPage.html">Search Students</a></li>
+            <li><a href="add-student.html" class="active">Add New Student</a></li>
+            <li><a href="updatedeletePage.html">Update/Delete Records</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html">Settings</a></li>
         </ul>
         <div class="bottom-nav">
-            <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
-            <a href="logout.html" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="profile.html">Profile</a>
+            <a href="#" id="logoutBtn">Logout</a>
         </div>
     </div>
 
-    <div class="content" role="main">
-        <h1 class="welcome-text">Welcome to Student Management</h1>
-
-        <div class="progress-bar">
-            <div class="progress"></div>
-        </div>
+    <div class="content">
+        <h1 class="page-title">Add New Student</h1>
 
         <form id="addStudentForm">
-            <div class="form-step" data-step="1">
-                <h2>Basic Information</h2>
-                <div class="input-group">
-                    <label for="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" required>
+            <div class="tab-container">
+                <div class="tabs">
+                    <button type="button" class="tab-btn active">Basic Info</button>
+                    <button type="button" class="tab-btn">Education</button>
+                    <button type="button" class="tab-btn">Certifications</button>
+                    <button type="button" class="tab-btn">Employment</button>
+                    <button type="button" class="tab-btn">Projects</button>
+                    <button type="button" class="tab-btn">Photo</button>
                 </div>
-                <div class="input-group">
-                    <label for="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" required>
-                </div>
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="input-group">
-                    <label for="dateOfBirth">Date of Birth</label>
-                    <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-                </div>
-            </div>
 
-            <div class="form-step" data-step="2">
-                <h2>Educational Background</h2>
-                <div class="input-group">
-                    <label for="highSchool">High School</label>
-                    <input type="text" id="highSchool" name="highSchool">
-                </div>
-                <div class="input-group">
-                    <label for="tenthGradeSchool">10th Grade School</label>
-                    <input type="text" id="tenthGradeSchool" name="tenthGradeSchool">
-                </div>
-                <div class="input-group">
-                    <label for="bachelorSubject">Bachelor Subject</label>
-                    <input type="text" id="bachelorSubject" name="bachelorSubject">
-                </div>
-            </div>
-
-            <div class="form-step" data-step="3">
-                <h2>Additional Information</h2>
-                <div class="toggle-section">
-                    <label class="toggle">
-                        <input type="checkbox" id="hasEmployment">
-                        <span class="slider"></span>
-                        Employment Information
-                    </label>
-                </div>
-                <div id="employmentSection" style="display:none;">
-                    <div class="input-group">
-                        <label for="currentEmployer">Current Employer</label>
-                        <input type="text" id="currentEmployer" name="currentEmployer">
+                <div id="basic" class="tab-content active">
+                    <div class="form-group">
+                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="firstName">First Name</label>
                     </div>
-                    <div class="input-group">
-                        <label for="jobTitle">Job Title</label>
-                        <input type="text" id="jobTitle" name="jobTitle">
+                    <div class="form-group">
+                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="lastName">Last Name</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required>
+                        <label for="email">Email</label>
+                    </div>
+                    <div class="form-group">
+                        <select id="bachelorSubject" name="bachelorSubject" required>
+                            <option value="">Select Subject</option>
+                            <option value="BCS">BCS</option>
+                            <option value="BHM">BHM</option>
+                            <option value="BBA">BBA</option>
+                        </select>
+                        <label for="bachelorSubject">Bachelor Subject</label>
                     </div>
                 </div>
 
-                <div class="toggle-section">
-                    <label class="toggle">
-                        <input type="checkbox" id="hasCertifications">
-                        <span class="slider"></span>
-                        Certifications
-                    </label>
-                </div>
-                <div id="certificationsSection" style="display:none;">
-                    <div id="certificationsList"></div>
-                    <button type="button" id="addCertification" class="btn-secondary">Add Another Certification</button>
+                <div id="education" class="tab-content">
+                    <div class="form-group">
+                        <input type="text" id="highSchool" name="highSchool">
+                        <label for="highSchool">High School</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="grade10School" name="grade10School">
+                        <label for="grade10School">10th Grade School</label>
+                    </div>
                 </div>
 
-                <div class="toggle-section">
-                    <label class="toggle">
-                        <input type="checkbox" id="hasProjects">
-                        <span class="slider"></span>
-                        Projects
-                    </label>
+                <div id="certifications" class="tab-content">
+                    <div id="certificationsContainer"></div>
+                    <button type="button" id="addCertification" class="add-button">Add Certification</button>
                 </div>
-                <div id="projectsSection" style="display:none;">
-                    <div id="projectsList"></div>
-                    <button type="button" id="addProject" class="btn-secondary">Add Another Project</button>
+
+                <div id="employments" class="tab-content">
+                    <div id="employmentsContainer"></div>
+                    <button type="button" id="addEmployment" class="add-button">Add Employment</button>
+                </div>
+
+                <div id="projects" class="tab-content">
+                    <div id="projectsContainer"></div>
+                    <button type="button" id="addProject" class="add-button">Add Project</button>
+                </div>
+
+                <div id="photo" class="tab-content">
+                    <div class="form-group file-upload">
+                        <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*" style="display: none;">
+                        <button type="button" id="uploadPhotoBtn" class="add-button">Add Photo</button>
+                        <div id="photoPreview"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-step" data-step="4">
-                <h2>Profile Photo</h2>
-                <div class="input-group">
-                    <label for="profilePhoto">Upload Photo</label>
-                    <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*">
-                </div>
-                <div id="photoPreview"></div>
-            </div>
-
-            <div class="form-navigation">
-                <button type="button" id="prevBtn" class="btn-secondary">Previous</button>
-                <button type="button" id="nextBtn" class="btn-primary">Next</button>
+            <div class="form-actions">
+                <button type="button" id="prevBtn" class="btn secondary">Previous</button>
+                <button type="button" id="nextBtn" class="btn primary">Next</button>
+                <button type="submit" id="submitBtn" class="btn primary" style="display: none;">Submit</button>
             </div>
         </form>
-
-        <div id="successMessage" style="display:none;">
-            <div class="success-content">
-                <div class="photo-section">
-                    <img id="studentPhotoPreview" src="../assets/default-avatar.png" alt="Student Photo">
-                </div>
-                <div class="message-section">
-                    <h2 id="studentSuccessMessage"></h2>
-                    <p id="successText"></p>
-                </div>
-            </div>
-            <button id="addAnotherStudent" class="btn-primary">Add Another Student</button>
-        </div>
     </div>
 </div>
 
+<div id="loadingAnimation" class="loading-animation" style="display: none;">
+    <div class="spinner"></div>
+    <p>Adding student...</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script src="../src/global.js"></script>
 <script src="../src/add-student-script.js"></script>
 </body>
-</html>>
+</html>

@@ -7,10 +7,7 @@ const courseSchema = new mongoose.Schema({
 
 });
 
-if (mongoose.models.Course) {
-    module.exports = mongoose.model('Course');
-} else {
-    module.exports = mongoose.model('Course', courseSchema);
-}
+const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
 
+module.exports = Course;
 

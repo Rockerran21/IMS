@@ -1,12 +1,10 @@
-// File: adminDashboard.js
-
 document.addEventListener('DOMContentLoaded', function() {
     initializeParticles();
     initializeSidebar();
     initializeLogout();
     initializeDashboard();
+    fetchDashboardData();
 });
-
 function initializeParticles() {
     particlesJS('particles-js', {
         particles: {
@@ -48,6 +46,7 @@ function initializeLogout() {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             // Add logout logic here
+            console.log('Logout button clicked');
             alert('Logout functionality to be implemented');
         });
     } else {
@@ -59,7 +58,6 @@ function initializeDashboard() {
     initializeSummaryCards();
     initializeCharts();
     initializeCalendar();
-    fetchDashboardData();
 }
 
 function initializeSummaryCards() {
@@ -70,9 +68,9 @@ function initializeSummaryCards() {
     };
 
     if (summaryCards.totalStudents && summaryCards.totalFaculty && summaryCards.coursesOffered) {
-        summaryCards.totalStudents.textContent = 'No data available';
-        summaryCards.totalFaculty.textContent = 'No data available';
-        summaryCards.coursesOffered.textContent = 'No data available';
+        summaryCards.totalStudents.textContent = 'Loading...';
+        summaryCards.totalFaculty.textContent = 'Loading...';
+        summaryCards.coursesOffered.textContent = 'Loading...';
     } else {
         console.error('Summary card elements not found');
     }
@@ -144,13 +142,15 @@ function initializeEnrollmentTrendChart() {
     const enrollmentTrendCtx = document.getElementById('enrollment-trend-chart');
     if (enrollmentTrendCtx) {
         window.enrollmentTrendChart = new Chart(enrollmentTrendCtx.getContext('2d'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: ['2020', '2021', '2022', '2023', '2024'],
                 datasets: [{
                     label: 'Student Enrollment',
                     data: [0, 0, 0, 0, 0],
-                    backgroundColor: '#9b59b6'
+                    borderColor: '#9b59b6',
+                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                    fill: true
                 }]
             },
             options: {
@@ -224,54 +224,34 @@ function hideLoadingIndicators() {
 
 function fetchDashboardData() {
     showLoadingIndicators();
-
-    // Simulating API call with setTimeout
-    setTimeout(() => {
-        const mockData = {
-            totalStudents: 793,
-            totalFaculty: 3,
-            coursesOffered: 50,
-            departmentData: {
-                BCS: 332,
-                BHM: 421,
-                BBA: 40
-            },
-            genderData: {
-                male: 555,
-                female: 238
-            },
-            enrollmentTrend: {
-                '2020': 650,
-                '2021': 700,
-                '2022': 750,
-                '2023': 780,
-                '2024': 793
-            }
-        };
-        updateDashboardWithData(mockData);
-        hideLoadingIndicators();
-    }, 1000);
-
-    // When you're ready to fetch real data, use this:
-    /*
-    fetch('http://your-api-endpoint/dashboard-data')
+    fetch('http://localhost:8080/api/dashboards/dashboard-data')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
+            console.log('Dashboard data received:', data);
             updateDashboardWithData(data);
         })
         .catch(error => {
-            console.error('Error fetching dashboard data:', error);
-            // Keep the "No data available" display if fetch fails
+            console.error('Error fetching dashboard data:', error.message);
+            if (error.message.includes('404')) {
+                console.error('Endpoint not found. Check if the server is running and the endpoint is correct.');
+            }
+            updateDashboardWithData({
+                totalStudents: 'Error loading data',
+                totalFaculty: 'Error loading data',
+                coursesOffered: 'Error loading data',
+                departmentData: {},
+                genderData: {},
+                enrollmentTrend: {}
+            });
         })
         .finally(() => {
             hideLoadingIndicators();
         });
-    */
 }
 
 function updateDashboardWithData(data) {
@@ -280,47 +260,51 @@ function updateDashboardWithData(data) {
 }
 
 function updateSummaryCards(data) {
-    const summaryCards = {
-        totalStudents: document.querySelector('#total-students p'),
-        totalFaculty: document.querySelector('#total-faculty p'),
-        coursesOffered: document.querySelector('#courses-offered p')
-    };
-
-    if (summaryCards.totalStudents && summaryCards.totalFaculty && summaryCards.coursesOffered) {
-        summaryCards.totalStudents.textContent = data.totalStudents || 'No data available';
-        summaryCards.totalFaculty.textContent = data.totalFaculty || 'No data available';
-        summaryCards.coursesOffered.textContent = data.coursesOffered || 'No data available';
-    } else {
-        console.error('Summary card elements not found');
-    }
+    document.querySelector('#total-students p').textContent = data.totalStudents;
+    document.querySelector('#total-faculty p').textContent = data.totalFaculty;
+    document.querySelector('#courses-offered p').textContent = data.coursesOffered;
 }
 
 function updateCharts(data) {
-    if (window.departmentChart && data.departmentData) {
+    updateDepartmentChart(data.departmentData);
+    updateGenderChart(data.genderData);
+    updateEnrollmentTrendChart(data.enrollmentTrend);
+}
+
+function updateDepartmentChart(departmentData) {
+    if (window.departmentChart && departmentData) {
         window.departmentChart.data.datasets[0].data = [
-            data.departmentData.BCS || 332,
-            data.departmentData.BHM || 421,
-            data.departmentData.BBA || 40
+            departmentData.BCS || 0,
+            departmentData.BHM || 0,
+            departmentData.BBA || 0
         ];
         window.departmentChart.update();
     }
+}
 
-    if (window.genderChart && data.genderData) {
+function updateGenderChart(genderData) {
+    if (window.genderChart && genderData) {
         window.genderChart.data.datasets[0].data = [
-            data.genderData.male || 555,
-            data.genderData.female || 238
+            genderData.male || 0,
+            genderData.female || 0
         ];
         window.genderChart.update();
     }
+}
 
-    if (window.enrollmentTrendChart && data.enrollmentTrend) {
+function updateEnrollmentTrendChart(enrollmentTrend) {
+    if (window.enrollmentTrendChart && enrollmentTrend) {
         window.enrollmentTrendChart.data.datasets[0].data = [
-            data.enrollmentTrend['2020'] || 650,
-            data.enrollmentTrend['2021'] || 700,
-            data.enrollmentTrend['2022'] || 750,
-            data.enrollmentTrend['2023'] || 780,
-            data.enrollmentTrend['2024'] || 720
+            enrollmentTrend['2020'] || 0,
+            enrollmentTrend['2021'] || 0,
+            enrollmentTrend['2022'] || 0,
+            enrollmentTrend['2023'] || 0,
+            enrollmentTrend['2024'] || 0
         ];
         window.enrollmentTrendChart.update();
     }
 }
+
+
+
+

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { auth } = require('../middleware/auth');  // Adjust the path as needed based on your folder structure
+
 
 router.post('/register', async (req, res) => {
     try {
@@ -105,4 +107,70 @@ router.post('/forgot-password', async (req, res) => {
         res.status(500).json({ message: 'Error in forgot password process', error: error.message });
     }
 });
+router.get('/profile', auth, async (req, res) => {
+    try {
+        // Send back the logged-in user's data
+        res.json({
+            username: req.user.username,
+            email: req.user.email,
+            phone: req.user.phone,
+            role: req.user.role
+        });
+    } catch (error) {
+        res.status(500).send({ error: 'Failed to load profile data' });
+    }
+});
+router.post('/change-password', auth, async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+
+        // Fetch the logged-in user
+        const user = await User.findById(req.user._id);
+
+        // Verify the old password
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Old password is incorrect' });
+        }
+
+        // Update the password
+        user.password = newPassword;
+        await user.save();
+
+        // Invalidate the current token by simply asking the user to log in again
+        res.json({ message: 'Password changed successfully. Please log in again.' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ error: 'Failed to change password' });
+    }
+});
+
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        // Find user by reset token
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }  // Check if token is still valid
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: 'Password reset token is invalid or has expired.' });
+        }
+
+        // Update the password and clear the token fields
+        user.password = newPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.json({ message: 'Password has been reset successfully. Please log in with your new password.' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ error: 'Failed to reset password. Please try again.' });
+    }
+});
+
+
 module.exports = router;

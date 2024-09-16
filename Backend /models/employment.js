@@ -7,4 +7,5 @@ const employmentSchema = new mongoose.Schema({
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true }
 });
 
-module.exports = mongoose.model('Employment', employmentSchema);
+const Employment = mongoose.models.Employment || mongoose.model('Employment', employmentSchema);
+module.exports = Employment;

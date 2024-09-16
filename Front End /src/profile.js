@@ -29,22 +29,31 @@ function initializeParticles() {
 }
 
 function loadAdminProfile() {
-    // Simulate loading admin profile data
-    const adminData = {
-        name: 'John Doe',
-        email: 'john.doe@forbescollege.edu',
-        phone: '+1 (123) 456-7890',
-        defaultDashboardView: 'summary',
-        notificationPreference: 'email'
-    };
+    fetch('http://localhost:8080/api/auth/profile', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error fetching profile:', data.error);
+                return;
+            }
 
-    document.getElementById('adminName').textContent = adminData.name;
-    document.getElementById('fullName').value = adminData.name;
-    document.getElementById('email').value = adminData.email;
-    document.getElementById('phone').value = adminData.phone;
-    document.getElementById('defaultDashboardView').value = adminData.defaultDashboardView;
-    document.getElementById('notificationPreference').value = adminData.notificationPreference;
+            // Populate the profile fields with the data
+            document.getElementById('adminName').textContent = data.username;
+            document.getElementById('fullName').value = data.username;
+            document.getElementById('email').value = data.email;
+            document.getElementById('phone').value = data.phone;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
+
 
 function initializeFormSubmissions() {
     document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
@@ -55,13 +64,44 @@ function initializeFormSubmissions() {
 
     document.getElementById('securityForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        // Simulate changing password
-        if (document.getElementById('newPassword').value !== document.getElementById('confirmPassword').value) {
+
+        const oldPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
             alert('New passwords do not match!');
             return;
         }
-        alert('Password changed successfully!');
+
+        // Send the request to change the password
+        fetch('http://localhost:8080/api/auth/change-password', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ oldPassword, newPassword })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error); // Display error if old password is incorrect
+                } else {
+                    alert(data.message); // Display success message
+
+                    // Log out the user after password change
+                    localStorage.removeItem('token'); // Remove token from localStorage
+                    window.location.href = 'login.html'; // Redirect to login page
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to change password. Please try again.');
+            });
     });
+
+
 
     document.getElementById('preferencesForm').addEventListener('submit', function(e) {
         e.preventDefault();

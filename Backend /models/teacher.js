@@ -12,8 +12,6 @@ const teacherSchema = new mongoose.Schema({
     courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
 });
 
-if (mongoose.models.Teacher) {
-    module.exports = mongoose.model('Teacher');
-} else {
-    module.exports = mongoose.model('Teacher', teacherSchema);
-}
+const Teacher = mongoose.models.Teacher || mongoose.model('Teacher', teacherSchema);
+
+module.exports = Teacher;

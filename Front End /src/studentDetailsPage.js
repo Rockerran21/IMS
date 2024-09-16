@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function fetchStudentDetails(studentId) {
     const apiUrl = `http://localhost:8080/api/students/${studentId}`;
-    const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+    const token = localStorage.getItem('token');
 
     fetch(apiUrl, {
         headers: {
@@ -17,39 +17,64 @@ function fetchStudentDetails(studentId) {
             'Content-Type': 'application/json'
         }
     })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(student => {
-            displayStudentDetails(student);
-        })
-        .catch(error => {
-            console.error('Error fetching student details:', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-            }
-            document.getElementById('content').innerHTML = `
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(student => {
+        console.log('Fetched student data:', student); // Add this line for debugging
+        displayStudentDetails(student);
+    })
+    .catch(error => {
+        console.error('Error fetching student details:', error);
+        if (error.response) {
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+        }
+        document.getElementById('content').innerHTML = `
             <p>Error loading student details: ${error.message}</p>
             <p>Please check the console for more information and try again later.</p>
         `;
-        });
+    });
 }
 function displayStudentDetails(student) {
+    console.log('Received student data:', student); // Add this line for debugging
+
     document.getElementById('studentName').textContent = `${student.firstName} ${student.lastName}`;
     document.getElementById('studentEmail').textContent = student.email;
     document.getElementById('studentDepartment').textContent = student.bachelorSubject || 'N/A';
+    document.getElementById('studentGender').textContent = student.gender || 'Not specified';
 
     const studentPhoto = document.getElementById('studentPhoto');
+    const token = localStorage.getItem('token');
     studentPhoto.src = `http://localhost:8080/api/students/${student._id}/photo`;
     studentPhoto.alt = `${student.firstName} ${student.lastName}'s photo`;
-    studentPhoto.onerror = function() {
-        this.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgB730p0ChSl_CNr5N6n05AGzEtEAhFypOFg&s';
+    studentPhoto.onerror = function(e) {
+        console.error('Error loading student photo:', e);
+        console.error('Failed URL:', this.src);
+        fetch(this.src, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const objectURL = URL.createObjectURL(blob);
+            this.src = objectURL;
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            this.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgB730p0ChSl_CNr5N6n05AGzEtEAhFypOFg&s';
+        });
     };
 
     displayPersonalInfo(student);
@@ -90,6 +115,7 @@ function displaySkills(skills) {
 
 function displayCertifications(certifications) {
     const certificationsContainer = document.getElementById('certifications');
+    console.log('Certifications:', certifications);
     if (certifications && certifications.length > 0) {
         const certificationsHtml = certifications.map(cert => `
             <div class="certification-item">
@@ -98,6 +124,7 @@ function displayCertifications(certifications) {
                 <div><strong>Date:</strong> ${new Date(cert.dateObtained).toLocaleDateString()}</div>
             </div>
         `).join('');
+        console.log('Certifications HTML:', certificationsHtml);
         certificationsContainer.innerHTML = certificationsHtml;
     } else {
         certificationsContainer.innerHTML = '<p>No certifications listed.</p>';

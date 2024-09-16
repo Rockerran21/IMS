@@ -71,16 +71,12 @@ exports.createStudent = async (req, res) => {
         await student.save({ session });
         await session.commitTransaction();
 
-        console.log('Student created successfully:', JSON.stringify(student, null, 2));
-        const populatedStudent = await Student.findById(student._id).populate('certifications employments projects');
+        const populatedStudent = await Student.findById(student._id).populate('certifications employments projects skills');
         res.status(201).json(populatedStudent);
     } catch (err) {
         await session.abortTransaction();
         console.error('Error in createStudent:', err);
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({ message: err.message, errors: err.errors });
-        }
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(400).json({ message: err.message, stack: err.stack });
     } finally {
         session.endSession();
     }
@@ -484,15 +480,22 @@ exports.uploadPhoto = async (req, res) => {
 };
 exports.getStudentPhoto = async (req, res) => {
     try {
+        console.log('Fetching photo for student ID:', req.params.id);
         const student = await Student.findById(req.params.id);
-        if (!student || !student.profilePhoto || !student.profilePhoto.data) {
+        if (!student) {
+            console.log('Student not found');
+            return res.status(404).send('Student not found');
+        }
+        if (!student.profilePhoto || !student.profilePhoto.data) {
+            console.log('No photo found for student');
             return res.status(404).send('No photo found');
         }
+        console.log('Photo found, sending response');
         res.set('Content-Type', student.profilePhoto.contentType);
         res.send(student.profilePhoto.data);
     } catch (err) {
         console.error('Error in getStudentPhoto:', err);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error: ' + err.message);
     }
 };
 

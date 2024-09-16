@@ -30,8 +30,8 @@ router.post('/', async (req, res) => {
 
 // Update one skill
 router.patch('/:id', getSkill, async (req, res) => {
-    if (req.body.skillName != null) {
-        res.skill.skillName = req.body.skillName;
+    if (req.body.name != null) {
+        res.skill.name = req.body.name;
     }
     try {
         const updatedSkill = await res.skill.save();

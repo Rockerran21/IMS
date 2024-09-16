@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const skillSchema = new mongoose.Schema({
-    skillName: { type: String, required: true, unique: true },
-    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }] // Ensure this is an array of ObjectIds
+    name: { type: String, required: true, unique: true },
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }]
 });
 
-// Ensure students array is properly initialized
 skillSchema.pre('save', function (next) {
     if (!this.students) {
         this.students = [];
@@ -13,4 +12,9 @@ skillSchema.pre('save', function (next) {
     next();
 });
 
-module.exports = mongoose.model('Skill', skillSchema);
+// Drop existing indexes
+mongoose.connection.collections['skills']?.dropIndexes().catch(err => console.log('No indexes to drop on skills collection'));
+
+const Skill = mongoose.models.Skill || mongoose.model('Skill', skillSchema);
+
+module.exports = Skill;

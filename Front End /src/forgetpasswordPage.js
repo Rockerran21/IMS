@@ -1,8 +1,6 @@
-// forgot-password.js
-
 document.addEventListener('DOMContentLoaded', function() {
     initializeParticles();
-    initializeForgotPasswordForm();
+    initializeResetPasswordForm();
 });
 
 function initializeParticles() {
@@ -25,30 +23,42 @@ function initializeParticles() {
     });
 }
 
-function initializeForgotPasswordForm() {
-    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+function initializeResetPasswordForm() {
+    const resetPasswordForm = document.getElementById('resetPasswordForm');
     const messageDiv = document.getElementById('message');
 
-    forgotPasswordForm.addEventListener('submit', async (e) => {
+    resetPasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const token = document.getElementById('token').value;  // Assuming token is passed here
+
+        if (password !== confirmPassword) {
+            messageDiv.textContent = 'Passwords do not match!';
+            messageDiv.style.color = 'red';
+            return;
+        }
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
+            const response = await fetch('http://localhost:8080/api/auth/reset-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ token, newPassword: password }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                messageDiv.textContent = 'Password reset email sent. Please check your inbox.';
+                messageDiv.textContent = 'Password reset successfully. Please log in with your new password.';
                 messageDiv.style.color = 'green';
+                // Optionally, redirect to login page after a few seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
             } else {
-                throw new Error(data.message || 'Password reset request failed');
+                throw new Error(data.error || 'Password reset failed.');
             }
         } catch (error) {
             messageDiv.textContent = error.message;
@@ -56,3 +66,9 @@ function initializeForgotPasswordForm() {
         }
     });
 }
+function getTokenFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('token');
+}
+
+document.getElementById('token').value = getTokenFromUrl();

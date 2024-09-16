@@ -15,10 +15,13 @@ const courseRoutes = require('./routes/courseRoutes');
 const authRoutes = require('./routes/authRoutes');
 const app = express();
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const { auth } = require('./middleware/auth');  // Adjust the path as needed
 
-app.use(cors());
 app.use(express.json());
-
+app.use(cors({
+    origin: 'http://localhost:63342', // Ensure this matches your frontend URL
+    credentials: true
+}));
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -41,8 +44,16 @@ app.use('/api/dashboards', dashboardRoutes);
 // Middleware setup for various authentication functionality
 app.use('/api/auth', authRoutes);
 
+app.get('/profile.html', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, './Users/ranjanmarasini/IdeaProjects/IMS/Front End /pages/profile.html'));
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Add this at the end of your routes
+app.use((req, res, next) => {
+  res.status(404).json({ message: `Route ${req.url} Not found.` });
+});
 
 module.exports = app;
