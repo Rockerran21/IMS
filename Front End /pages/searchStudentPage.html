@@ -6,6 +6,7 @@
     <title>Forbes College - Search Students</title>
     <link rel="stylesheet" href="../styles/searchStudentPage.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
 <div id="particles-js"></div>
@@ -57,9 +58,15 @@
                 <option value="4">Semester 4</option>
                 <option value="5">Semester 5</option>
                 <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
             </select>
-            <input type="date" id="admissionDateFilter" placeholder="Admission Date">
-            <input type="text" id="skillsFilter" placeholder="Skills (comma-separated)">
+            <input type="text" id="admissionDateFilter" class="date-picker" placeholder="Admission Date">
+            <select id="genderFilter">
+                <option value="">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
         </div>
 
         <div id="searchResults" class="search-results">
@@ -73,5 +80,6 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 <script src="../src/searchStudentPage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>

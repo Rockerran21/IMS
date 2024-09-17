@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeParticles();
     initializeSidebar();
     initializeSearchFunctionality();
+    initializeDatePicker();
 });
 
 function initializeParticles() {
@@ -46,7 +47,7 @@ function initializeSearchFunctionality() {
     const departmentFilter = document.getElementById('departmentFilter');
     const semesterFilter = document.getElementById('semesterFilter');
     const admissionDateFilter = document.getElementById('admissionDateFilter');
-    const skillsFilter = document.getElementById('skillsFilter');
+    const genderFilter = document.getElementById('genderFilter');
     const autoSuggest = document.getElementById('autoSuggest');
 
     searchBtn.addEventListener('click', performSearch);
@@ -99,20 +100,24 @@ function performSearch() {
     const department = document.getElementById('departmentFilter').value;
     const semester = document.getElementById('semesterFilter').value;
     const admissionDate = document.getElementById('admissionDateFilter').value;
-    const skills = document.getElementById('skillsFilter').value;
+    const gender = document.getElementById('genderFilter').value;
 
     showLoadingAnimation();
+
+    currentPage = 1; // Reset current page
+    totalResults = 0; // Reset total results
 
     const queryParams = new URLSearchParams({
         query: searchTerm,
         department: department,
         semester: semester,
         admissionDate: admissionDate,
-        skills: skills
+        gender: gender,
+        page: currentPage // Add page parameter
     });
 
     const url = `${API_BASE_URL}/api/students/search?${queryParams}`;
-    console.log('Fetching from URL:', url); // Log the URL being fetched
+    console.log('Fetching from URL:', url);
 
     fetch(url, {
         method: 'GET',
@@ -132,7 +137,13 @@ function performSearch() {
         })
         .then(data => {
             console.log('Received data:', data); // Log the received data
-            displaySearchResults(data);
+            if (Array.isArray(data)) {
+                totalResults = data.length; // Update total results
+                displaySearchResults(data);
+            } else {
+                console.error('Unexpected response format:', data);
+                throw new Error('Unexpected response format');
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -142,11 +153,24 @@ function performSearch() {
             hideLoadingAnimation();
         });
 }
-function displaySearchResults(results) {
-    const searchResults = document.getElementById('searchResults');
-    searchResults.innerHTML = '';
 
-    if (results.length === 0) {
+function displaySearchResults(results, append = false) {
+    const searchResults = document.getElementById('searchResults');
+    const searchContainer = document.querySelector('.search-container');
+    
+    if (!append) {
+        searchResults.innerHTML = '';
+        searchContainer.classList.add('results-shown');
+        window.scrollTo(0, 0);
+    }
+
+    if (!Array.isArray(results)) {
+        console.error('Expected results to be an array, but got:', results);
+        searchResults.innerHTML = '<p>An error occurred while displaying results.</p>';
+        return;
+    }
+
+    if (results.length === 0 && !append) {
         searchResults.innerHTML = '<p>No results found.</p>';
         return;
     }
@@ -156,13 +180,84 @@ function displaySearchResults(results) {
         studentCard.className = 'student-card';
         studentCard.innerHTML = `
             <h3>${student.firstName} ${student.lastName}</h3>
-            <p>Email: ${student.email}</p>
-            <p>Department: ${student.bachelorSubject || 'N/A'}</p>
-            <p>Skills: ${student.skills ? student.skills.map(skill => skill.skillName).join(', ') : 'N/A'}</p>
+            <p><i class="fas fa-envelope"></i> ${student.email}</p>
+            <p><i class="fas fa-graduation-cap"></i> ${student.bachelorSubject || 'N/A'}</p>
+            <p><i class="fas fa-venus-mars"></i> ${student.gender || 'N/A'}</p>
             <a href="studentDetailsPage.html?id=${student._id}" class="see-more">See More</a>
         `;
         searchResults.appendChild(studentCard);
     });
+
+    const existingLoadMoreBtn = document.getElementById('loadMoreBtn');
+    if (existingLoadMoreBtn) {
+        existingLoadMoreBtn.remove();
+    }
+
+    if (results.length >= 10 && totalResults > currentPage * 10) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'loadMoreBtn';
+        loadMoreBtn.className = 'load-more-btn';
+        loadMoreBtn.textContent = 'Load More';
+        loadMoreBtn.addEventListener('click', loadMoreResults);
+        searchResults.appendChild(loadMoreBtn);
+    }
+}
+
+function loadMoreResults() {
+    currentPage += 1; // Increment current page
+
+    const searchTerm = document.getElementById('searchInput').value;
+    const department = document.getElementById('departmentFilter').value;
+    const semester = document.getElementById('semesterFilter').value;
+    const admissionDate = document.getElementById('admissionDateFilter').value;
+    const gender = document.getElementById('genderFilter').value;
+
+    showLoadingAnimation();
+
+    const queryParams = new URLSearchParams({
+        query: searchTerm,
+        department: department,
+        semester: semester,
+        admissionDate: admissionDate,
+        gender: gender,
+        page: currentPage // Add page parameter
+    });
+
+    const url = `${API_BASE_URL}/api/students/search?${queryParams}`;
+    console.log('Fetching from URL:', url);
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            console.log('Response status:', response.status); // Log the response status
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received data:', data); // Log the received data
+            if (Array.isArray(data)) {
+                displaySearchResults(data, true); // Append results
+            } else {
+                console.error('Unexpected response format:', data);
+                throw new Error('Unexpected response format');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('searchResults').innerHTML = `<p>An error occurred while searching: ${error.message}</p>`;
+        })
+        .finally(() => {
+            hideLoadingAnimation();
+        });
 }
 
 function showLoadingAnimation() {
@@ -172,3 +267,12 @@ function showLoadingAnimation() {
 function hideLoadingAnimation() {
     document.getElementById('loadingAnimation').style.display = 'none';
 }
+
+function initializeDatePicker() {
+    flatpickr('.date-picker', {
+        dateFormat: 'Y-m-d',
+    });
+}
+
+let currentPage = 1;
+let totalResults = 0;
