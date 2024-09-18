@@ -95,7 +95,13 @@ function handleAutoSuggestClick(e) {
     }
 }
 
+const RESULTS_PER_PAGE = 9;
+let currentPage = 1;
+let totalResults = 0;
+let allResults = [];
+
 function performSearch() {
+    document.getElementById('searchResultsContainer').style.display = 'none';
     const searchTerm = document.getElementById('searchInput').value;
     const department = document.getElementById('departmentFilter').value;
     const semester = document.getElementById('semesterFilter').value;
@@ -104,16 +110,16 @@ function performSearch() {
 
     showLoadingAnimation();
 
-    currentPage = 1; // Reset current page
-    totalResults = 0; // Reset total results
+    currentPage = 1;
+    totalResults = 0;
+    allResults = [];
 
     const queryParams = new URLSearchParams({
         query: searchTerm,
         department: department,
         semester: semester,
         admissionDate: admissionDate,
-        gender: gender,
-        page: currentPage // Add page parameter
+        gender: gender
     });
 
     const url = `${API_BASE_URL}/api/students/search?${queryParams}`;
@@ -127,7 +133,7 @@ function performSearch() {
         }
     })
         .then(response => {
-            console.log('Response status:', response.status); // Log the response status
+            console.log('Response status:', response.status);
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
@@ -136,10 +142,11 @@ function performSearch() {
             return response.json();
         })
         .then(data => {
-            console.log('Received data:', data); // Log the received data
+            console.log('Received data:', data);
             if (Array.isArray(data)) {
-                totalResults = data.length; // Update total results
-                displaySearchResults(data);
+                allResults = data;
+                totalResults = data.length;
+                displaySearchResults();
             } else {
                 console.error('Unexpected response format:', data);
                 throw new Error('Unexpected response format');
@@ -154,28 +161,22 @@ function performSearch() {
         });
 }
 
-function displaySearchResults(results, append = false) {
+function displaySearchResults() {
+    const searchResultsContainer = document.getElementById('searchResultsContainer');
     const searchResults = document.getElementById('searchResults');
-    const searchContainer = document.querySelector('.search-container');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
     
-    if (!append) {
+    if (currentPage === 1) {
         searchResults.innerHTML = '';
-        searchContainer.classList.add('results-shown');
-        window.scrollTo(0, 0);
+        searchResultsContainer.style.display = 'block';
+        window.scrollTo(0, searchResultsContainer.offsetTop);
     }
 
-    if (!Array.isArray(results)) {
-        console.error('Expected results to be an array, but got:', results);
-        searchResults.innerHTML = '<p>An error occurred while displaying results.</p>';
-        return;
-    }
+    const startIndex = (currentPage - 1) * RESULTS_PER_PAGE;
+    const endIndex = Math.min(startIndex + RESULTS_PER_PAGE, totalResults);
+    const resultsToDisplay = allResults.slice(startIndex, endIndex);
 
-    if (results.length === 0 && !append) {
-        searchResults.innerHTML = '<p>No results found.</p>';
-        return;
-    }
-
-    results.forEach(student => {
+    resultsToDisplay.forEach(student => {
         const studentCard = document.createElement('div');
         studentCard.className = 'student-card';
         studentCard.innerHTML = `
@@ -188,76 +189,17 @@ function displaySearchResults(results, append = false) {
         searchResults.appendChild(studentCard);
     });
 
-    const existingLoadMoreBtn = document.getElementById('loadMoreBtn');
-    if (existingLoadMoreBtn) {
-        existingLoadMoreBtn.remove();
-    }
-
-    if (results.length >= 10 && totalResults > currentPage * 10) {
-        const loadMoreBtn = document.createElement('button');
-        loadMoreBtn.id = 'loadMoreBtn';
-        loadMoreBtn.className = 'load-more-btn';
-        loadMoreBtn.textContent = 'Load More';
-        loadMoreBtn.addEventListener('click', loadMoreResults);
-        searchResults.appendChild(loadMoreBtn);
+    if (endIndex < totalResults) {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.onclick = loadMoreResults;
+    } else {
+        loadMoreBtn.style.display = 'none';
     }
 }
 
 function loadMoreResults() {
-    currentPage += 1; // Increment current page
-
-    const searchTerm = document.getElementById('searchInput').value;
-    const department = document.getElementById('departmentFilter').value;
-    const semester = document.getElementById('semesterFilter').value;
-    const admissionDate = document.getElementById('admissionDateFilter').value;
-    const gender = document.getElementById('genderFilter').value;
-
-    showLoadingAnimation();
-
-    const queryParams = new URLSearchParams({
-        query: searchTerm,
-        department: department,
-        semester: semester,
-        admissionDate: admissionDate,
-        gender: gender,
-        page: currentPage // Add page parameter
-    });
-
-    const url = `${API_BASE_URL}/api/students/search?${queryParams}`;
-    console.log('Fetching from URL:', url);
-
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            console.log('Response status:', response.status); // Log the response status
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Received data:', data); // Log the received data
-            if (Array.isArray(data)) {
-                displaySearchResults(data, true); // Append results
-            } else {
-                console.error('Unexpected response format:', data);
-                throw new Error('Unexpected response format');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('searchResults').innerHTML = `<p>An error occurred while searching: ${error.message}</p>`;
-        })
-        .finally(() => {
-            hideLoadingAnimation();
-        });
+    currentPage += 1;
+    displaySearchResults();
 }
 
 function showLoadingAnimation() {
@@ -273,6 +215,3 @@ function initializeDatePicker() {
         dateFormat: 'Y-m-d',
     });
 }
-
-let currentPage = 1;
-let totalResults = 0;

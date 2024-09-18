@@ -36,7 +36,7 @@ db.once('open', async () => {
         console.log('Skills created');
 
         // Generate and insert new student records
-        const studentCount = 120;
+        const studentCount = 500; // Increased for better analytics data
         const departments = ['BCS', 'BHM', 'BBA'];
         const genders = ['Male', 'Female'];
         for (let i = 0; i < studentCount; i++) {
@@ -49,14 +49,14 @@ db.once('open', async () => {
                 highSchool: faker.company.name() + ' High School',
                 grade10School: faker.company.name() + ' School',
                 gender: faker.helpers.arrayElement(genders),
-                admissionYear: faker.date.between({ from: '2020-01-01', to: '2024-12-31' }).getFullYear()
+                dateOfEnrollment: faker.date.between({ from: '2020-01-01', to: '2024-12-31' })
             });
 
             // Add certifications
             const certCount = faker.number.int({ min: 0, max: 3 });
             for (let j = 0; j < certCount; j++) {
                 const cert = new Certification({
-                    certificationName: faker.company.catchPhrase(),
+                    certificationName: faker.helpers.arrayElement(['AWS', 'CISCO', 'CompTIA', 'Microsoft', 'Google']),
                     issuingAuthority: faker.company.name(),
                     dateObtained: faker.date.past({ years: 5 }),
                     studentId: student._id
@@ -70,6 +70,7 @@ db.once('open', async () => {
             for (let j = 0; j < empCount; j++) {
                 const emp = new Employment({
                     employerName: faker.company.name(),
+                    title: faker.person.jobTitle(),
                     currentEmployer: j === 0,
                     currentField: faker.person.jobTitle(),
                     studentId: student._id
@@ -97,13 +98,13 @@ db.once('open', async () => {
             await student.save();
 
             // Create user account for student
-            const userPassword = await bcrypt.hash('password123', 8); // Use a default password for easy testing
+            const userPassword = await bcrypt.hash('password123', 8);
             await User.create({
                 username: faker.internet.userName(),
                 password: userPassword,
                 email: student.email,
                 phone: faker.phone.number(),
-                role: 'user', // Changed from 'student' to 'user'
+                role: 'user',
                 studentId: student._id
             });
 
@@ -111,7 +112,7 @@ db.once('open', async () => {
         }
 
         // Create teachers and courses
-        const teacherCount = 10;
+        const teacherCount = 50; // Increased for better analytics data
         for (let i = 0; i < teacherCount; i++) {
             const teacher = new Teacher({
                 firstName: faker.person.firstName(),
@@ -122,7 +123,7 @@ db.once('open', async () => {
             await teacher.save();
 
             // Create user account for teacher
-            const userPassword = await bcrypt.hash('password123', 8); // Use a default password for easy testing
+            const userPassword = await bcrypt.hash('password123', 8);
             await User.create({
                 username: faker.internet.userName(),
                 password: userPassword,
@@ -136,34 +137,22 @@ db.once('open', async () => {
             const courseCount = faker.number.int({ min: 2, max: 3 });
             for (let j = 0; j < courseCount; j++) {
                 const course = new Course({
-                    courseName: faker.company.catchPhrase(), // Changed from 'name' to 'courseName'
+                    courseName: faker.company.catchPhrase(),
                     code: faker.string.alphanumeric(6).toUpperCase(),
                     description: faker.lorem.sentence(),
                     credits: faker.number.int({ min: 1, max: 4 }),
                     teacherId: teacher._id
                 });
                 await course.save();
-                teacher.courses.push(course._id);
             }
-            await teacher.save();
 
             console.log(`Created teacher ${i + 1} of ${teacherCount}`);
         }
 
-        // Create an admin user
-        await User.create({
-            username: 'admin',
-            password: await bcrypt.hash('admin123', 8),
-            email: 'admin@example.com',
-            phone: faker.phone.number(),
-            role: 'admin'
-        });
-        console.log('Admin user created');
-
-        console.log('Database population complete');
+        console.log('Database population completed successfully');
+        process.exit(0);
     } catch (error) {
         console.error('Error populating database:', error);
-    } finally {
-        mongoose.connection.close();
+        process.exit(1);
     }
 });

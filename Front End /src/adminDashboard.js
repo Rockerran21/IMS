@@ -141,13 +141,16 @@ function initializeGenderChart() {
 function initializeEnrollmentTrendChart() {
     const enrollmentTrendCtx = document.getElementById('enrollment-trend-chart');
     if (enrollmentTrendCtx) {
+        if (window.enrollmentTrendChart) {
+            window.enrollmentTrendChart.destroy();
+        }
         window.enrollmentTrendChart = new Chart(enrollmentTrendCtx.getContext('2d'), {
             type: 'line',
             data: {
-                labels: ['2020', '2021', '2022', '2023', '2024'],
+                labels: [],
                 datasets: [{
                     label: 'Student Enrollment',
-                    data: [0, 0, 0, 0, 0],
+                    data: [],
                     borderColor: '#9b59b6',
                     backgroundColor: 'rgba(155, 89, 182, 0.2)',
                     fill: true
@@ -268,7 +271,7 @@ function updateSummaryCards(data) {
 function updateCharts(data) {
     updateDepartmentChart(data.departmentData);
     updateGenderChart(data.genderData);
-    updateEnrollmentTrendChart(data.enrollmentTrend);
+    updateEnrollmentTrendChart(data.enrollmentTrendData);
 }
 
 function updateDepartmentChart(departmentData) {
@@ -284,23 +287,20 @@ function updateDepartmentChart(departmentData) {
 
 function updateGenderChart(genderData) {
     if (window.genderChart && genderData) {
-        window.genderChart.data.datasets[0].data = [
-            genderData.male || 0,
-            genderData.female || 0
-        ];
+        const labels = genderData.map(item => item._id);
+        const data = genderData.map(item => item.count);
+        window.genderChart.data.labels = labels;
+        window.genderChart.data.datasets[0].data = data;
         window.genderChart.update();
     }
 }
 
-function updateEnrollmentTrendChart(enrollmentTrend) {
-    if (window.enrollmentTrendChart && enrollmentTrend) {
-        window.enrollmentTrendChart.data.datasets[0].data = [
-            enrollmentTrend['2020'] || 0,
-            enrollmentTrend['2021'] || 0,
-            enrollmentTrend['2022'] || 0,
-            enrollmentTrend['2023'] || 0,
-            enrollmentTrend['2024'] || 0
-        ];
+function updateEnrollmentTrendChart(enrollmentTrendData) {
+    if (window.enrollmentTrendChart && enrollmentTrendData) {
+        const years = Object.keys(enrollmentTrendData).sort();
+        const data = years.map(year => enrollmentTrendData[year]);
+        window.enrollmentTrendChart.data.labels = years;
+        window.enrollmentTrendChart.data.datasets[0].data = data;
         window.enrollmentTrendChart.update();
     }
 }

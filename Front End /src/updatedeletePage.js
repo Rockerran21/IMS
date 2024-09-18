@@ -1,11 +1,11 @@
-// updatedelete.js
-
 const API_BASE_URL = 'http://localhost:8080';
+const RESULTS_PER_PAGE = 9; 
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeParticles();
     initializeSidebar();
     initializeSearchFunctionality();
+    initializeDatePickers();
 });
 let currentStudentId;
 
@@ -57,55 +57,111 @@ function initializeSearchFunctionality() {
 }
 
 function performSearch() {
+    document.getElementById('searchResultsContainer').style.display = 'none';
     const searchTerm = document.getElementById('searchInput').value;
+    
+    // Check if filter elements exist before accessing their values
+    const department = document.getElementById('departmentFilter')?.value || '';
+    const semester = document.getElementById('semesterFilter')?.value || '';
+    const admissionDate = document.getElementById('admissionDateFilter')?.value || '';
+    const gender = document.getElementById('genderFilter')?.value || '';
+
     showLoadingAnimation();
 
-    fetch(`${API_BASE_URL}/api/students/search?query=${searchTerm}`, {
+    currentPage = 1;
+    totalResults = 0;
+    allResults = [];
+
+    const queryParams = new URLSearchParams({
+        query: searchTerm,
+        department: department,
+        semester: semester,
+        admissionDate: admissionDate,
+        gender: gender
+    });
+
+    const url = `${API_BASE_URL}/api/students/search?${queryParams}`;
+    console.log('Fetching from URL:', url);
+
+    fetch(url, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            displaySearchResults(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('searchResults').innerHTML = `<p>An error occurred while searching: ${error.message}</p>`;
-        })
-        .finally(() => {
-            hideLoadingAnimation();
-        });
-}
-
-function displaySearchResults(results) {
-    const searchResults = document.getElementById('searchResults');
-    searchResults.innerHTML = '';
-
-    if (results.length === 0) {
-        searchResults.innerHTML = '<p>No results found.</p>';
-        return;
-    }
-
-    results.forEach(student => {
-        const studentCard = document.createElement('div');
-        studentCard.className = 'student-card';
-        studentCard.innerHTML = `
-            <div class="student-info">
-                <h3>${student.firstName} ${student.lastName}</h3>
-                <p><i class="fas fa-envelope"></i> ${student.email}</p>
-                <p><i class="fas fa-graduation-cap"></i> ${student.bachelorSubject || 'N/A'}</p>
-            </div>
-            <button onclick="viewStudentDetails('${student._id}')" class="view-more-btn">View More</button>
-        `;
-        searchResults.appendChild(studentCard);
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Received data:', data);
+        if (Array.isArray(data)) {
+            allResults = data;
+            totalResults = data.length;
+            displaySearchResults();
+        } else {
+            console.error('Unexpected response format:', data);
+            throw new Error('Unexpected response format');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('searchResults').innerHTML = `<p>An error occurred while searching: ${error.message}</p>`;
+    })
+    .finally(() => {
+        hideLoadingAnimation();
     });
 }
 
+function displaySearchResults() {
+    const searchResultsContainer = document.getElementById('searchResultsContainer');
+    const searchResults = document.getElementById('searchResults');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    
+    if (currentPage === 1) {
+        searchResults.innerHTML = '';
+        searchResultsContainer.style.display = 'block';
+        window.scrollTo(0, searchResultsContainer.offsetTop);
+    }
+
+    const startIndex = (currentPage - 1) * RESULTS_PER_PAGE;
+    const endIndex = Math.min(startIndex + RESULTS_PER_PAGE, totalResults);
+    const resultsToDisplay = allResults.slice(startIndex, endIndex);
+
+    resultsToDisplay.forEach(student => {
+        const studentCard = document.createElement('div');
+        studentCard.className = 'student-card';
+        studentCard.innerHTML = `
+            <h3>${student.firstName} ${student.lastName}</h3>
+            <p><i class="fas fa-envelope"></i> ${student.email}</p>
+            <p><i class="fas fa-graduation-cap"></i> ${student.bachelorSubject || 'N/A'}</p>
+            <p><i class="fas fa-venus-mars"></i> ${student.gender || 'N/A'}</p>
+            <button onclick="viewStudentDetails('${student._id}')" class="see-more">Update/Delete</button>
+        `;
+        searchResults.appendChild(studentCard);
+    });
+
+    if (endIndex < totalResults) {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.onclick = loadMoreResults;
+    } else {
+        loadMoreBtn.style.display = 'none';
+    }
+}
+
+function loadMoreResults() {
+    currentPage += 1;
+    displaySearchResults();
+}
+
 function viewStudentDetails(studentId) {
-    currentStudentId = studentId;  // Store the current student ID
+    currentStudentId = studentId;
     showLoadingAnimation();
     fetch(`${API_BASE_URL}/api/students/${studentId}`, {
         method: 'GET',
@@ -118,6 +174,8 @@ function viewStudentDetails(studentId) {
         .then(student => {
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('updateSection').style.display = 'block';
+            document.querySelector('.search-and-filters').style.display = 'none';
+            document.getElementById('searchResultsContainer').style.display = 'none';
             populateUpdateForm(student);
         })
         .catch(error => {
@@ -164,16 +222,45 @@ function populateUpdateForm(student) {
             <div class="form-step active">
                 <h3>Basic Information</h3>
                 <div class="input-group">
-                    <label for="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" value="${student.firstName}" required>
+                    <div>
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" value="${student.firstName}" required>
+                    </div>
+                    <div>
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" value="${student.lastName}" required>
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="${student.email}" required>
+                    </div>
+                    <div>
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="male" ${student.gender === 'male' ? 'selected' : ''}>Male</option>
+                            <option value="female" ${student.gender === 'female' ? 'selected' : ''}>Female</option>
+                            <option value="other" ${student.gender === 'other' ? 'selected' : ''}>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bachelorSubject">Bachelor Subject</label>
+                        <input type="text" id="bachelorSubject" name="bachelorSubject" value="${student.bachelorSubject || ''}" required>
+                    </div>
+                    <div>
+                        <label for="currentSemester">Current Semester</label>
+                        <input type="number" id="currentSemester" name="currentSemester" value="${student.currentSemester || ''}" required>
+                    </div>
+                    <div>
+                        <label for="dateOfEnrollment">Admission Date</label>
+                        <input type="text" id="dateOfEnrollment" name="dateOfEnrollment" class="date-picker" value="${student.dateOfEnrollment ? new Date(student.dateOfEnrollment).toISOString().split('T')[0] : ''}" required>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" value="${student.lastName}" required>
-                </div>
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="${student.email}" required>
+                <div class="input-group profile-photo-section">
+                    <div>
+                        <label for="profilePhoto">Profile Photo</label>
+                        <img id="profilePhotoPreview" alt="Profile Photo Preview">
+                        <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*" onchange="previewProfilePhoto(this)">
+                    </div>
                 </div>
             </div>
             <div class="form-step">
@@ -192,14 +279,14 @@ function populateUpdateForm(student) {
                 <button type="button" class="add-more-btn" onclick="addProject()">Add Project</button>
             </div>
             <div class="form-navigation">
-                <button type="button" id="prevBtn" onclick="navigateForm(-1)">Previous</button>
-                <button type="button" id="nextBtn" onclick="navigateForm(1)">Next</button>
+                <button type="button" id="prevBtn" class="btn-secondary" onclick="navigateForm(-1)">Previous</button>
+                <button type="button" id="nextBtn" class="btn-primary" onclick="navigateForm(1)">Next</button>
             </div>
         </form>
         <div class="action-buttons">
-            <button type="button" class="btn-update" onclick="updateStudent('${student._id}')">Update</button>
-            <button type="button" class="btn-delete" onclick="showDeleteConfirmation('${student._id}')">Delete</button>
-            <button type="button" class="btn-back" onclick="backToSearch()">Back to Search</button>
+            <button type="button" class="btn-primary" onclick="showUpdateConfirmation('${student._id}')">Update</button>
+            <button type="button" class="btn-danger" onclick="showDeleteConfirmation('${student._id}')">Delete</button>
+            <button type="button" class="btn-secondary" onclick="backToSearch()">Back to Search</button>
         </div>
     `;
 
@@ -208,6 +295,8 @@ function populateUpdateForm(student) {
     populateProjects(student.projects || []);
     currentStep = 0;
     navigateForm(0);
+    initializeDatePickers();
+    loadStudentPhoto(student._id);
 }
 
 function populateCertifications(certifications) {
@@ -225,7 +314,7 @@ function addCertification(cert = {}, index = Date.now()) {
             <input type="text" name="certifications[${index}][name]" value="${cert.name || ''}" placeholder="Certification Name" required>
             <input type="text" name="certifications[${index}][authority]" value="${cert.authority || ''}" placeholder="Issuing Authority" required>
             <input type="date" name="certifications[${index}][date]" value="${cert.date || ''}" required>
-            <button type="button" onclick="removeCertification(this)">Remove</button>
+            <button type="button" class="btn-danger" onclick="removeCertification(this)">Remove</button>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', certHtml);
@@ -248,12 +337,13 @@ function addEmployment(emp = {}, index = Date.now()) {
     const empHtml = `
         <div class="employment-item">
             <input type="text" name="employments[${index}][employerName]" value="${emp.employerName || ''}" placeholder="Employer Name" required>
+            <input type="text" name="employments[${index}][title]" value="${emp.title || ''}" placeholder="Job Title" required>
             <input type="text" name="employments[${index}][currentField]" value="${emp.currentField || ''}" placeholder="Current Field">
             <label>
                 <input type="checkbox" name="employments[${index}][currentEmployer]" ${emp.currentEmployer ? 'checked' : ''}>
                 Current Employer
             </label>
-            <button type="button" onclick="removeEmployment(this)">Remove</button>
+            <button type="button" class="btn-danger" onclick="removeEmployment(this)">Remove</button>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', empHtml);
@@ -266,6 +356,7 @@ function processEmployments() {
     for (let item of empItems) {
         employments.push({
             employerName: item.querySelector('input[name$="[employerName]"]').value,
+            title: item.querySelector('input[name$="[title]"]').value || 'Not specified',
             currentField: item.querySelector('input[name$="[currentField]"]').value,
             currentEmployer: item.querySelector('input[name$="[currentEmployer]"]').checked
         });
@@ -291,55 +382,80 @@ function addProject(proj = {}, index = Date.now()) {
         <div class="project-item">
             <input type="text" name="projects[${index}][projectName]" value="${proj.projectName || ''}" placeholder="Project Name" required>
             <textarea name="projects[${index}][description]" placeholder="Project Description">${proj.description || ''}</textarea>
-            <button type="button" onclick="removeProject(this)">Remove</button>
+            <button type="button" class="btn-danger" onclick="removeProject(this)">Remove</button>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', projHtml);
 }
+
 function removeProject(button) {
     button.closest('.project-item').remove();
 }
 
-function updateStudent() {
-    const formData = new FormData(document.getElementById('updateForm'));
-    const studentData = Object.fromEntries(formData.entries());
+function showUpdateConfirmation(studentId) {
+    const modal = document.getElementById('updateConfirmModal');
+    modal.style.display = 'block';
+    
+    document.getElementById('confirmUpdateBtn').onclick = function() {
+        modal.style.display = 'none';
+        updateStudent(studentId);
+    };
+    
+    document.getElementById('cancelUpdateBtn').onclick = function() {
+        modal.style.display = 'none';
+    };
+}
 
-    studentData.certifications = processCertifications();
-    studentData.employments = processEmployments();
-    studentData.projects = processProjects();
+function updateStudent(studentId) {
+    const form = document.getElementById('updateForm');
+    const formData = new FormData(form);
+    const updatedStudent = {};
 
-    console.log('Updating student with data:', studentData);
+    formData.forEach((value, key) => {
+        if (value !== '') {
+            updatedStudent[key] = value;
+        }
+    });
 
     showLoadingAnimation();
-    fetch(`${API_BASE_URL}/api/students/${currentStudentId}`, {
+
+    fetch(`${API_BASE_URL}/api/students/${studentId}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(studentData)
+        body: JSON.stringify(updatedStudent)
     })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(updatedStudent => {
-            console.log('Server response:', updatedStudent);
-            showMessage(`Student ${updatedStudent.firstName} ${updatedStudent.lastName} has been updated successfully.`);
-            viewStudentDetails(currentStudentId);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(`Failed to update student: ${error.message}`, 'error');
-        })
-        .finally(() => {
-            hideLoadingAnimation();
-        });
-    console.log('Updating student with data:', studentData);
-}
+    .then(response => response.json())
+    .then(async (result) => {
+        console.log('Success:', result);
 
+        // Handle photo upload
+        const photoFile = formData.get('profilePhoto');
+        if (photoFile && photoFile.size > 0) {
+            const photoFormData = new FormData();
+            photoFormData.append('photoUpload', photoFile);
+
+            await fetch(`${API_BASE_URL}/api/students/${studentId}/photo`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: photoFormData
+            });
+        }
+
+        showSuccessMessage(`Student ${result.firstName} ${result.lastName} has been updated successfully.`);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        showMessage('Failed to update student. Please try again.', 'error');
+    })
+    .finally(() => {
+        hideLoadingAnimation();
+    });
+}
 
 function processProjects() {
     const projects = [];
@@ -362,25 +478,24 @@ function processCertifications() {
         certifications.push({
             certificationName: item.querySelector('input[name$="[name]"]').value,
             issuingAuthority: item.querySelector('input[name$="[authority]"]').value,
-            dateObtained: item.querySelector('input[name$="[date]"]').value
+            dateObtained: item.querySelector('input[name$="[date]"]').value || new Date().toISOString().split('T')[0]
         });
     }
     return certifications;
 }
 
 function showDeleteConfirmation(studentId) {
-    const deleteSection = document.getElementById('deleteSection');
-    deleteSection.style.display = 'block';
-    deleteSection.innerHTML = `
-        <div class="confirmation-modal">
-            <h2>Confirm Deletion</h2>
-            <p>Are you sure you want to delete this student? This action cannot be undone.</p>
-            <div class="action-buttons">
-                <button onclick="deleteStudent('${studentId}')" class="btn-delete">Yes, Delete</button>
-                <button onclick="cancelDelete()" class="btn-cancel">Cancel</button>
-            </div>
-        </div>
-    `;
+    const modal = document.getElementById('deleteConfirmModal');
+    modal.style.display = 'block';
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        modal.style.display = 'none';
+        deleteStudent(studentId);
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        modal.style.display = 'none';
+    };
 }
 
 function deleteStudent(studentId) {
@@ -391,34 +506,35 @@ function deleteStudent(studentId) {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
     })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage(data.message || 'Student has been deleted successfully.');
-            backToSearch();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(`Failed to delete student: ${error.message}`, 'error');
-        })
-        .finally(() => {
-            hideLoadingAnimation();
-        });
-}
-
-function cancelDelete() {
-    document.getElementById('deleteSection').style.display = 'none';
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showMessage(data.message || 'Student has been deleted successfully.');
+        backToSearch();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage(`Failed to delete student: ${error.message}`, 'error');
+    })
+    .finally(() => {
+        hideLoadingAnimation();
+    });
 }
 
 function backToSearch() {
-    document.getElementById('searchResults').style.display = 'grid';
-    document.getElementById('updateSection').style.display = 'none';
-    document.getElementById('deleteSection').style.display = 'none';
-    document.getElementById('messageBox').style.display = 'none';
+    const searchResults = document.getElementById('searchResults');
+    const updateSection = document.getElementById('updateSection');
+    const deleteSection = document.getElementById('deleteSection');
+    const messageBox = document.getElementById('messageBox');
+
+    if (searchResults) searchResults.style.display = 'grid';
+    if (updateSection) updateSection.style.display = 'none';
+    if (deleteSection) deleteSection.style.display = 'none';
+    if (messageBox) messageBox.style.display = 'none';
 }
 
 function showMessage(message, type = 'success') {
@@ -437,6 +553,67 @@ function showLoadingAnimation() {
 
 function hideLoadingAnimation() {
     document.getElementById('loadingAnimation').style.display = 'none';
+}
+
+function initializeDatePickers() {
+    flatpickr('.date-picker', {
+        dateFormat: 'Y-m-d',
+    });
+}
+
+function showSuccessMessage(message) {
+    const messageBox = document.getElementById('messageBox');
+    messageBox.textContent = message;
+    messageBox.className = 'message-box success';
+    messageBox.style.display = 'block';
+    messageBox.style.position = 'fixed';
+    messageBox.style.top = '50%';
+    messageBox.style.left = '50%';
+    messageBox.style.transform = 'translate(-50%, -50%)';
+    messageBox.style.zIndex = '1000';
+    
+    setTimeout(() => {
+        messageBox.style.display = 'none';
+        backToSearch();
+    }, 3000);
+}
+
+function previewProfilePhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePhotoPreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function loadStudentPhoto(studentId) {
+    const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+    const token = localStorage.getItem('token');
+    
+    profilePhotoPreview.src = `${API_BASE_URL}/api/students/${studentId}/photo`;
+    profilePhotoPreview.onerror = function() {
+        fetch(`${API_BASE_URL}/api/students/${studentId}/photo`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const objectURL = URL.createObjectURL(blob);
+            this.src = objectURL;
+        })
+        .catch(error => {
+            console.error('Error loading student photo:', error);
+            this.src = '../assets/default-avatar.png';
+        });
+    };
 }
 
 // Logout functionality

@@ -14,19 +14,32 @@ exports.getDashboardData = async (req, res) => {
             BBA: await Student.countDocuments({ bachelorSubject: 'BBA' })
         };
 
-        const genderData = {
-            male: await Student.countDocuments({ gender: 'male' }),
-            female: await Student.countDocuments({ gender: 'female' })
-        };
+        const genderData = await Student.aggregate([
+            {
+                $group: {
+                    _id: "$gender",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
 
         const currentYear = new Date().getFullYear();
-        const enrollmentTrend = {
-            '2020': await Student.countDocuments({ admissionYear: 2020 }),
-            '2021': await Student.countDocuments({ admissionYear: 2021 }),
-            '2022': await Student.countDocuments({ admissionYear: 2022 }),
-            '2023': await Student.countDocuments({ admissionYear: 2023 }),
-            '2024': await Student.countDocuments({ admissionYear: 2024 })
-        };
+        const enrollmentTrend = await Student.aggregate([
+            {
+                $group: {
+                    _id: { $year: "$dateOfEnrollment" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ]);
+
+        const enrollmentTrendData = enrollmentTrend.reduce((acc, { _id, count }) => {
+            acc[_id] = count;
+            return acc;
+        }, {});
 
         res.json({
             totalStudents,
@@ -34,7 +47,7 @@ exports.getDashboardData = async (req, res) => {
             coursesOffered,
             departmentData,
             genderData,
-            enrollmentTrend
+            enrollmentTrendData
         });
     } catch (error) {
         console.error('Error in getDashboardData:', error);

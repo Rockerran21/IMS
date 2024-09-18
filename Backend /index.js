@@ -16,7 +16,7 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { auth } = require('./middleware/auth');  // Adjust the path as needed
-
+const analyticsRoutes = require('./routes/analyticsRoutes');
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:63342', // Ensure this matches your frontend URL
@@ -39,7 +39,7 @@ app.use('/api/skills', skillRoutes);
 app.use('/api/studentskills', studentSkillRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/dashboards', dashboardRoutes);
-
+app.use('/api/analytics', analyticsRoutes);
 
 // Middleware setup for various authentication functionality
 app.use('/api/auth', authRoutes);
@@ -50,6 +50,7 @@ app.get('/profile.html', auth, (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 
 // Add this at the end of your routes
 app.use((req, res, next) => {

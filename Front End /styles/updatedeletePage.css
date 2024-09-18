@@ -70,206 +70,126 @@ body, html {
     flex-grow: 1;
     padding: 40px;
     overflow-y: auto;
-}
-
-.welcome-text {
-    font-size: 28px;
-    color: var(--white);
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.search-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.search-and-filters {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-gradient);
+    z-index: 10;
+    padding: 20px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-.search-container input {
-    flex-grow: 1;
-    padding: 10px;
+.search-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    width: 60%;
+    padding: 12px 15px;
     font-size: 16px;
     border: none;
     border-radius: 5px 0 0 5px;
 }
 
-.search-container button {
-    padding: 10px 20px;
+#searchBtn {
+    padding: 12px 25px;
     font-size: 16px;
+    background-color: var(--primary-color);
+    color: var(--white);
     border: none;
     border-radius: 0 5px 5px 0;
-    background-color: var(--primary-color);
-    color: var(--white);
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.btn-primary, .btn-secondary, .btn-danger {
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+#searchBtn:hover {
+    background-color: #5a6fd6;
 }
 
-.search-input-container {
-    width: 80%;
-    max-width: 600px;
-}
-
-#searchInput {
-    padding: 15px 20px;
-    font-size: 18px;
-}
-
-#searchBtn {
-    padding: 15px 30px;
-    font-size: 18px;
-}
-.btn-primary {
-    background-color: var(--primary-color);
-    color: var(--white);
-}
-
-.btn-secondary {
-    background-color: #f0f0f0;
-    color: var(--text-color);
-}
-
-.btn-danger {
-    background-color: var(--danger-color);
-    color: var(--white);
-}
-
-.student-info {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-#certificationsList, #employmentsList, #projectsList {
-    margin-top: 10px;
-}
-
-.certification-item, .employment-item, .project-item {
-    margin-bottom: 10px;
-}
-
-#messageBox {
-    padding: 20px;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: var(--text-color);
-}
-
-/* Add these styles to your updatedelete.css file */
-
-.multi-step-form {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.form-step {
-    display: none;
-}
-
-.form-step.active {
-    display: block;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.input-group input,
-.input-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.form-navigation {
+.filter-container {
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.form-navigation button {
-    padding: 10px 20px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.add-more-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.update-section {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.multi-step-form {
-    margin-bottom: 20px;
-}
-
-.form-step {
-    display: none;
-}
-
-.form-step.active {
-    display: block;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.input-group input,
-.input-group textarea {
+    justify-content: center;
+    gap: 10px;
     width: 100%;
+}
+
+.filter-container select,
+.filter-container input {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
-.form-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+.search-results-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
 }
 
-.form-navigation button,
-.action-buttons button,
-.add-more-btn {
+.search-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.student-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--white);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.student-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.student-card h3 {
+    color: #000000;
+}
+
+.student-card p {
+    margin: 5px 0;
+}
+
+.student-card .see-more {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.student-card .see-more:hover {
+    background-color: var(--secondary-color);
+}
+
+.load-more-btn {
+    display: block;
+    margin: 20px auto;
     padding: 10px 20px;
     background-color: var(--primary-color);
     color: white;
@@ -279,10 +199,65 @@ body, html {
     transition: background-color 0.3s ease;
 }
 
-.form-navigation button:hover,
-.action-buttons button:hover,
-.add-more-btn:hover {
-    background-color: var(--secondary-color);
+.load-more-btn:hover {
+    background-color: #5a6fd6;
+}
+
+.update-section {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.update-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.input-group > div {
+    flex-basis: calc(50% - 10px);
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--secondary-color);
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .action-buttons {
@@ -291,27 +266,233 @@ body, html {
     margin-top: 20px;
 }
 
+.btn-update,
+.btn-delete,
+.btn-back {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 .btn-delete {
-    background-color: #f44336;
+    background-color: var(--danger-color);
+    color: white;
 }
 
 .btn-back {
-    background-color: #2196F3;
+    background-color: #ccc;
+    color: black;
 }
 
-.project-item {
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    padding: 15px;
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.loading-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid var(--primary-color);
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
     margin-bottom: 15px;
 }
 
-.project-item input,
-.project-item textarea {
-    width: 100%;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .search-and-filters {
+        flex-direction: column;
+    }
+
+    .search-input-container {
+        width: 100%;
+    }
+
+    #searchBtn {
+        width: 100%;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .search-results {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-primary, .btn-secondary, .btn-danger, .add-more-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5a6fd6;
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-danger {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #ff3333;
+}
+
+.add-more-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.add-more-btn:hover {
+    background-color: #45a049;
+}
+
+.flatpickr-input:not([readonly]) {
+    background-color: transparent;
+}
+
+.flatpickr-input:not([readonly])::placeholder {
+    color: transparent;
+}
+
+.flatpickr-input:not([readonly]):focus::placeholder {
+    color: initial;
+}
+
+.profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#profilePhotoPreview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
     margin-bottom: 10px;
 }
 
-.project-item textarea {
-    min-height: 100px;
+#profilePhoto {
+    margin-top: 10px;
+}
+
+.btn-secondary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-color);
+}
+
+.multi-step-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-step {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.input-group > div {
+    margin-bottom: 15px;
+}
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
 }

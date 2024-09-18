@@ -121,57 +121,51 @@ function initializeCharts() {
 }
 
 function fetchAnalyticsData() {
-    // Simulate API call
-    setTimeout(() => {
-        const mockData = {
-            enrollmentTrend: [500, 550, 600, 650, 700],
-            departmentDistribution: [300, 250, 150],
-            genderDistribution: [400, 300],
-            topSkills: [
-                { name: 'JavaScript', count: 150 },
-                { name: 'Python', count: 120 },
-                { name: 'Java', count: 100 },
-                { name: 'SQL', count: 80 },
-                { name: 'React', count: 60 }
-            ],
-            certificationStats: [
-                { name: 'AWS Certified', count: 50 },
-                { name: 'CISCO CCNA', count: 40 },
-                { name: 'CompTIA A+', count: 30 },
-                { name: 'Google Cloud', count: 25 },
-                { name: 'Microsoft Azure', count: 20 }
-            ],
-            employmentRate: 85
-        };
-        updateCharts(mockData);
-    }, 1000);
+    fetch('http://localhost:8080/api/analytics/analytics-data')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Analytics data received:', data);
+            updateChartsWithData(data);
+        })
+        .catch(error => {
+            console.error('Error fetching analytics data:', error);
+        });
 }
 
-function updateCharts(data) {
+function updateChartsWithData(data) {
     // Update Enrollment Trend Chart
     const enrollmentChart = Chart.getChart('enrollmentTrendChart');
-    enrollmentChart.data.datasets[0].data = data.enrollmentTrend;
+    enrollmentChart.data.labels = data.enrollmentTrend.map(item => item._id);
+    enrollmentChart.data.datasets[0].data = data.enrollmentTrend.map(item => item.count);
     enrollmentChart.update();
 
     // Update Department Distribution Chart
     const departmentChart = Chart.getChart('departmentDistributionChart');
-    departmentChart.data.datasets[0].data = data.departmentDistribution;
+    departmentChart.data.labels = data.departmentDistribution.map(item => item._id);
+    departmentChart.data.datasets[0].data = data.departmentDistribution.map(item => item.count);
     departmentChart.update();
 
     // Update Gender Distribution Chart
     const genderChart = Chart.getChart('genderDistributionChart');
-    genderChart.data.datasets[0].data = data.genderDistribution;
+    genderChart.data.labels = data.genderDistribution.map(item => item._id);
+    genderChart.data.datasets[0].data = data.genderDistribution.map(item => item.count);
     genderChart.update();
 
     // Update Top 5 Skills Chart
+    console.log('Updating skills chart with:', data.topSkills);
     const skillsChart = Chart.getChart('topSkillsChart');
-    skillsChart.data.labels = data.topSkills.map(skill => skill.name);
+    skillsChart.data.labels = data.topSkills.map(skill => skill._id);
     skillsChart.data.datasets[0].data = data.topSkills.map(skill => skill.count);
     skillsChart.update();
 
     // Update Certification Statistics Chart
     const certChart = Chart.getChart('certificationStatsChart');
-    certChart.data.labels = data.certificationStats.map(cert => cert.name);
+    certChart.data.labels = data.certificationStats.map(cert => cert._id);
     certChart.data.datasets[0].data = data.certificationStats.map(cert => cert.count);
     certChart.update();
 
