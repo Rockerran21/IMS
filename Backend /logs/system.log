@@ -1,0 +1,4 @@
+2024-09-19T18:13:10.908Z ERROR: Failed to read system logs: ENOENT: no such file or directory, open '/Users/ranjanmarasini/IdeaProjects/IMS/Backend /logs/system.log'
+2024-09-19T18:37:43.546Z ERROR: Failed to generate 2FA QR code: Cannot read properties of undefined (reading '_id')
+2024-09-19T19:02:45.395Z ERROR: Failed to generate 2FA QR code: Cast to ObjectId failed for value "12345" (type string) at path "_id" for model "User"
+2024-09-19T19:17:51.429Z ERROR: Failed to add user: User validation failed: phone: Path `phone` is required.

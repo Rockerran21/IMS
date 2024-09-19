@@ -42,7 +42,7 @@ function fetchStudentDetails(studentId) {
     });
 }
 function displayStudentDetails(student) {
-    console.log('Received student data:', student); // Add this line for debugging
+    console.log('Received student data:', student);
 
     document.getElementById('studentName').textContent = `${student.firstName} ${student.lastName}`;
     document.getElementById('studentEmail').textContent = student.email;
@@ -55,7 +55,6 @@ function displayStudentDetails(student) {
     studentPhoto.alt = `${student.firstName} ${student.lastName}'s photo`;
     studentPhoto.onerror = function(e) {
         console.error('Error loading student photo:', e);
-        console.error('Failed URL:', this.src);
         fetch(this.src, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -77,11 +76,22 @@ function displayStudentDetails(student) {
         });
     };
 
+    console.log('Displaying personal info:', student);
     displayPersonalInfo(student);
+
+    console.log('Displaying academic info:', student);
     displayAcademicInfo(student);
+
+    console.log('Displaying skills:', student.skills);
     displaySkills(student.skills);
+
+    console.log('Displaying certifications:', student.certifications);
     displayCertifications(student.certifications);
+
+    console.log('Displaying employments:', student.employments);
     displayEmployments(student.employments);
+
+    console.log('Displaying projects:', student.projects);
     displayProjects(student.projects);
 }
 
@@ -136,8 +146,9 @@ function displayEmployments(employments) {
     if (employments && employments.length > 0) {
         const employmentsHtml = employments.map(emp => `
             <div class="employment-item">
-                <h4>${emp.currentField || 'N/A'} at ${emp.employerName}</h4>
+                <h4>${emp.title || 'N/A'} at ${emp.employerName}</h4>
                 <div><strong>Current Employer:</strong> ${emp.currentEmployer ? 'Yes' : 'No'}</div>
+                <div><strong>Current Field:</strong> ${emp.currentField || 'N/A'}</div>
             </div>
         `).join('');
         employmentsContainer.innerHTML = employmentsHtml;

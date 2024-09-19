@@ -36,7 +36,14 @@
         <div class="settings-grid">
             <div class="settings-card">
                 <h2><i class="fas fa-user-shield"></i> User Management</h2>
-                <button id="manageUsersBtn" class="settings-btn">Manage Users</button>
+                <div class="search-container">
+                    <input type="text" id="userSearchInput" placeholder="Search users...">
+                    <button id="userSearchBtn" class="settings-btn">Search</button>
+                </div>
+                <div id="userSearchResults" class="user-list"></div>
+                <div id="loadingAnimation" class="loading-animation" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
             </div>
             <div class="settings-card">
                 <h2><i class="fas fa-database"></i> Database Settings</h2>

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFormSubmissions();
     loadActivityLog();
     initializeTabs();
+    initializeAvatarUpload();
 });
 
 function initializeParticles() {
@@ -29,37 +30,73 @@ function initializeParticles() {
 }
 
 function loadAdminProfile() {
-    fetch('http://localhost:8080/api/auth/profile', {
+    fetch('http://localhost:8080/api/users/profile', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error('Error fetching profile:', data.error);
-                return;
-            }
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error('Error fetching profile:', data.error);
+            return;
+        }
 
-            // Populate the profile fields with the data
-            document.getElementById('adminName').textContent = data.username;
-            document.getElementById('fullName').value = data.username;
-            document.getElementById('email').value = data.email;
-            document.getElementById('phone').value = data.phone;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        document.getElementById('adminName').textContent = data.username;
+        document.getElementById('fullName').value = data.username;
+        document.getElementById('email').value = data.email;
+        document.getElementById('phone').value = data.phone || '';
+
+        const avatarImg = document.getElementById('adminAvatar');
+        if (data.id) {
+            avatarImg.src = `http://localhost:8080/api/users/avatar/${data.id}`;
+            avatarImg.onerror = function() {
+                this.src = '../assets/default-avatar.png';
+            };
+        } else {
+            avatarImg.src = '../assets/default-avatar.png';
+        }
+
+        // Load preferences
+        document.getElementById('defaultDashboardView').value = data.defaultDashboardView || 'summary';
+        document.getElementById('notificationPreference').value = data.notificationPreference || 'email';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
-
 
 function initializeFormSubmissions() {
     document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
         e.preventDefault();
         // Simulate saving personal info
-        alert('Personal information updated successfully!');
+        fetch('http://localhost:8080/api/users/update-profile', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert('Personal information updated successfully!');
+                loadActivityLog();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update personal information. Please try again.');
+        });
     });
 
     document.getElementById('securityForm').addEventListener('submit', function(e) {
@@ -75,7 +112,7 @@ function initializeFormSubmissions() {
         }
 
         // Send the request to change the password
-        fetch('http://localhost:8080/api/auth/change-password', {
+        fetch('http://localhost:8080/api/users/change-password', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -101,30 +138,64 @@ function initializeFormSubmissions() {
             });
     });
 
-
-
     document.getElementById('preferencesForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        // Simulate saving preferences
-        alert('Preferences updated successfully!');
+        const defaultDashboardView = document.getElementById('defaultDashboardView').value;
+        const notificationPreference = document.getElementById('notificationPreference').value;
+
+        fetch('http://localhost:8080/api/users/update-preferences', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ defaultDashboardView, notificationPreference })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert('Preferences updated successfully!');
+                loadActivityLog();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update preferences. Please try again.');
+        });
     });
 }
 
 function loadActivityLog() {
-    const activityLog = document.getElementById('activityLog');
-    // Simulate loading activity log data
-    const activities = [
-        { action: 'Logged in', timestamp: '2024-09-13 08:30:00' },
-        { action: 'Updated student record', timestamp: '2024-09-13 09:15:23' },
-        { action: 'Generated monthly report', timestamp: '2024-09-13 11:45:10' },
-        { action: 'Added new course', timestamp: '2024-09-13 14:20:45' }
-    ];
-
-    activities.forEach(activity => {
-        const entry = document.createElement('div');
-        entry.className = 'activity-log-entry';
-        entry.innerHTML = `<strong>${activity.action}</strong> - ${activity.timestamp}`;
-        activityLog.appendChild(entry);
+    console.log('Fetching activity log...');
+    fetch('http://localhost:8080/api/users/activity-log', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(activities => {
+        console.log('Received activities:', activities);
+        const activityLog = document.getElementById('activityLog');
+        activityLog.innerHTML = '';
+        if (activities.length === 0) {
+            activityLog.innerHTML = '<p>No activities logged yet.</p>';
+        } else {
+            activities.forEach(activity => {
+                const entry = document.createElement('div');
+                entry.className = 'activity-log-entry';
+                const date = new Date(activity.timestamp);
+                entry.innerHTML = `<strong>${activity.action}</strong> - ${date.toLocaleString()}`;
+                activityLog.appendChild(entry);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching activity log:', error);
+        document.getElementById('activityLog').innerHTML = '<p>Error loading activity log.</p>';
     });
 }
 
@@ -147,10 +218,52 @@ function initializeTabs() {
     });
 }
 
-document.getElementById('changeAvatarBtn').addEventListener('click', function() {
-    // Simulate avatar change
-    alert('Avatar change functionality to be implemented');
-});
+function initializeAvatarUpload() {
+    const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+    const avatarUpload = document.getElementById('avatarUpload');
+    const avatarPreview = document.getElementById('adminAvatar');
+
+    changeAvatarBtn.addEventListener('click', function() {
+        avatarUpload.click();
+    });
+
+    avatarUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            fetch('http://localhost:8080/api/users/upload-avatar', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Avatar uploaded successfully!');
+                    loadAdminProfile();
+                    loadActivityLog();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to upload avatar. Please try again.');
+            });
+        }
+    });
+}
 
 // Logout functionality
 document.getElementById('logoutBtn').addEventListener('click', function(e) {

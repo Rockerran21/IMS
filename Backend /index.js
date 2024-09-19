@@ -17,6 +17,9 @@ const app = express();
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { auth } = require('./middleware/auth');  // Adjust the path as needed
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const fileUpload = require('express-fileupload');
+
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:63342', // Ensure this matches your frontend URL
@@ -40,6 +43,8 @@ app.use('/api/studentskills', studentSkillRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/dashboards', dashboardRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Middleware setup for various authentication functionality
 app.use('/api/auth', authRoutes);
@@ -51,10 +56,13 @@ app.get('/profile.html', auth, (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-
 // Add this at the end of your routes
 app.use((req, res, next) => {
   res.status(404).json({ message: `Route ${req.url} Not found.` });
 });
+
+app.use(fileUpload({
+    createParentPath: true
+}));
 
 module.exports = app;

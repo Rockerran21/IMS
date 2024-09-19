@@ -9,7 +9,13 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    avatar: {
+        data: Buffer,
+        contentType: String
+    },
+    defaultDashboardView: { type: String, default: 'summary' },
+    notificationPreference: { type: String, default: 'email' }
 });
 
 userSchema.pre('save', async function(next) {
