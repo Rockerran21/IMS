@@ -1,27 +1,68 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const authRoutes = require('./routes/auth');
+require('dotenv').config();
 
-dotenv.config();
-
+//Imports for respective api Calls
+const studentRoutes = require('./routes/studentRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const certificationRoutes = require('./routes/certificationRoutes');
+const employmentRoutes = require('./routes/employmentRoutes');
+const skillRoutes = require('./routes/skillRoutes');
+const studentSkillRoutes = require('./routes/studentSkillRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const authRoutes = require('./routes/authRoutes');
 const app = express();
-const PORT = process.env.PORT || 8080;
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const { auth } = require('./middleware/auth');  // Adjust the path as needed
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const fileUpload = require('express-fileupload');
 
-// Middleware
-app.use(cors());
 app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:63342', // Ensure this matches your frontend URL
+    credentials: true
+}));
 
-// Routes
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Could not connect to MongoDB', err));
+//API calls for respective database data fetching
+app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/certifications', certificationRoutes);
+app.use('/api/employments', employmentRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/studentskills', studentSkillRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/dashboards', dashboardRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
+
+// Middleware setup for various authentication functionality
 app.use('/api/auth', authRoutes);
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Failed to connect to MongoDB', err));
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+app.get('/profile.html', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, './Users/ranjanmarasini/IdeaProjects/IMS/Front End /pages/profile.html'));
 });
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Add this at the end of your routes
+app.use((req, res, next) => {
+  res.status(404).json({ message: `Route ${req.url} Not found.` });
+});
+
+app.use(fileUpload({
+    createParentPath: true
+}));
+
+module.exports = app;

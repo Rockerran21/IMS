@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forbes College IMS - Login</title>
+    <link rel="stylesheet" href="../styles/login.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<div id="particles-js"></div>
+<div class="container">
+    <div class="logo">
+        <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
+    </div>
+    <h1 class="welcome-text">Welcome to Forbes College Information Management System</h1>
+    <div class="login-form">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="remember-forgot">
+                <label>
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+                <a href="resetpasswordpage.html" class="forgot-password">Forgot Password?</a>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        <div id="message"></div>
+        <p class="register-link">Don't have an account? <a href="register.html">Sign up</a></p>
+    </div>
+</div>
+<script src="../src/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forbes College - Search Students</title>
+    <link rel="stylesheet" href="../styles/searchStudentPage.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="container">
+    <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#" class="active">Search Students</a></li>
+            <li><a href="add-student.html">Add New Student</a></li>
+            <li><a href="updatedeletePage.html">Update/Delete Records</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+        <div class="bottom-nav">
+            <a href="profile.html">Profile</a>
+            <a href="logout.html" id="logoutBtn">Logout</a>
+        </div>
+    </nav>
+
+    <main class="content" role="main">
+        <h1 class="page-title">Search Students</h1>
+
+        <div class="search-and-filters">
+            <div class="search-container">
+                <div class="search-input-container">
+                    <input type="text" id="searchInput" placeholder="Search by name or ID...">
+                    <ul id="autoSuggest" class="auto-suggest"></ul>
+                </div>
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="filters">
+                <select id="departmentFilter">
+                    <option value="">All Departments</option>
+                    <option value="BCS">BCS</option>
+                    <option value="BHM">BHM</option>
+                    <option value="BBA">BBA</option>
+                </select>
+                <select id="semesterFilter">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+                <input type="text" id="admissionDateFilter" class="date-picker" placeholder="Admission Date">
+                <select id="genderFilter">
+                    <option value="">All Genders</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="searchResultsContainer" class="search-results-container" style="display: none;">
+            <div id="searchResults" class="search-results">
+                <!-- Search results will be dynamically added here -->
+            </div>
+            <button id="loadMoreBtn" class="load-more-btn" style="display: none;">Load More</button>
+        </div>
+    </main>
+</div>
+<div id="loadingAnimation" class="loading-animation" style="display: none;">
+    <div class="spinner"></div>
+    <p>Searching...</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script src="../src/searchStudentPage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>

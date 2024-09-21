@@ -1,143 +1,158 @@
 const mongoose = require('mongoose');
+const { faker } = require('@faker-js/faker');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const Student = require('./models/student');
-const Teacher = require('./models/teacher');
-const Project = require('./models/project');
-const Certification = require('./models/certification');
-const Employment = require('./models/employment');
-const Skill = require('./models/skill');
-const StudentSkill = require('./models/studentSkill');
-const Course = require('./models/course');
+// Import all models
+const Student = require('./models/Student');
+const User = require('./models/User');
+const Certification = require('./models/Certification');
+const Employment = require('./models/Employment');
+const Project = require('./models/Project');
+const Teacher = require('./models/Teacher');
+const Course = require('./models/Course');
+const Skill = require('./models/Skill');
 
-const dbURI = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI;
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, dbName: 'IMSDatabase' })
-    .then(async () => {
-        console.log('Connected to MongoDB Atlas');
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-        // Clear existing data
-        await Student.deleteMany({});
-        await Teacher.deleteMany({});
-        await Project.deleteMany({});
-        await Certification.deleteMany({});
-        await Employment.deleteMany({});
-        await Skill.deleteMany({});
-        await StudentSkill.deleteMany({});
-        await Course.deleteMany({});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', async () => {
+    console.log('Connected to MongoDB');
 
-        console.log('Existing data removed');
+    try {
+        // Drop all collections
+        const collections = await mongoose.connection.db.collections();
+        for (let collection of collections) {
+            await collection.drop();
+        }
+        console.log('All collections dropped');
 
-        // Populate Students
-        const students = [
-            {
-                StudentID: 1,
-                FirstName: 'John',
-                LastName: 'Doe',
-                Email: 'john.doe@example.com',
-                CurrentEmployer: 'TechCorp',
-                PastEmployer: 'Innovate Inc.',
-                CurrentField: 'Software Development',
-                BachlorSubject: 'Computer Science',
-                HighSchoolGraduated: 'Lincoln High',
-                Grade10Schools: 'Central Middle School',
-                FinalProject: 'AI Chatbot',
-                LinkedInProfile: 'https://linkedin.com/in/johndoe'
+        // Create skills
+        const skills = ['JavaScript', 'Python', 'Java', 'C++', 'React', 'Node.js', 'SQL', 'MongoDB', 'AWS', 'Docker'];
+        const skillDocs = await Promise.all(skills.map(skillName => new Skill({ name: skillName }).save()));
+        console.log('Skills created');
+
+        // Generate and insert new student records
+        const studentCount = 500; // Increased for better analytics data
+        const departments = ['BCS', 'BHM', 'BBA'];
+        const genders = ['Male', 'Female'];
+        for (let i = 0; i < studentCount; i++) {
+            const student = new Student({
+                firstName: faker.person.firstName(),
+                lastName: faker.person.lastName(),
+                email: faker.internet.email(),
+                dateOfBirth: faker.date.past({ years: 30, refDate: new Date(2000, 0, 1) }),
+                bachelorSubject: faker.helpers.arrayElement(departments),
+                highSchool: faker.company.name() + ' High School',
+                grade10School: faker.company.name() + ' School',
+                gender: faker.helpers.arrayElement(genders),
+                dateOfEnrollment: faker.date.between({ from: '2020-01-01', to: '2024-12-31' })
+            });
+
+            // Add certifications
+            const certCount = faker.number.int({ min: 0, max: 3 });
+            for (let j = 0; j < certCount; j++) {
+                const cert = new Certification({
+                    certificationName: faker.helpers.arrayElement(['AWS', 'CISCO', 'CompTIA', 'Microsoft', 'Google']),
+                    issuingAuthority: faker.company.name(),
+                    dateObtained: faker.date.past({ years: 5 }),
+                    studentId: student._id
+                });
+                await cert.save();
+                student.certifications.push(cert._id);
             }
-        ];
-        await Student.insertMany(students);
 
-        // Populate Teachers
-        const teachers = [
-            {
-                TeacherID: 1,
-                FirstName: 'Jane',
-                LastName: 'Smith',
-                Email: 'jane.smith@example.com',
-                BachelorDegree: 'Mathematics',
-                MasterDegree: 'Statistics',
-                BachelorSubject: 'Mathematics',
-                MasterSubject: 'Statistics',
-                LinkedInProfile: 'https://linkedin.com/in/janesmith'
+            // Add employments
+            const empCount = faker.number.int({ min: 0, max: 2 });
+            for (let j = 0; j < empCount; j++) {
+                const emp = new Employment({
+                    employerName: faker.company.name(),
+                    title: faker.person.jobTitle(),
+                    currentEmployer: j === 0,
+                    currentField: faker.person.jobTitle(),
+                    studentId: student._id
+                });
+                await emp.save();
+                student.employments.push(emp._id);
             }
-        ];
-        await Teacher.insertMany(teachers);
 
-        // Populate Projects
-        const projects = [
-            {
-                ProjectID: 1,
-                ProjectName: 'AI Research',
-                Description: 'Research on AI algorithms',
-                StudentID: 1
+            // Add projects
+            const projCount = faker.number.int({ min: 0, max: 4 });
+            for (let j = 0; j < projCount; j++) {
+                const proj = new Project({
+                    projectName: faker.commerce.productName(),
+                    description: faker.lorem.paragraph(),
+                    studentId: student._id
+                });
+                await proj.save();
+                student.projects.push(proj._id);
             }
-        ];
-        await Project.insertMany(projects);
 
-        // Populate Certifications
-        const certifications = [
-            {
-                CertificationID: 1,
-                CertificationName: 'AWS Certified',
-                IssuingAuthority: 'Amazon',
-                DateObtained: new Date('2022-01-01'),
-                StudentID: 1
+            // Add skills
+            const studentSkills = faker.helpers.arrayElements(skillDocs, { min: 1, max: 5 });
+            student.skills = studentSkills.map(skill => skill._id);
+
+            await student.save();
+
+            // Create user account for student
+            const userPassword = await bcrypt.hash('password123', 8);
+            await User.create({
+                username: faker.internet.userName(),
+                password: userPassword,
+                email: student.email,
+                phone: faker.phone.number(),
+                role: 'user',
+                studentId: student._id
+            });
+
+            console.log(`Created student ${i + 1} of ${studentCount}`);
+        }
+
+        // Create teachers and courses
+        const teacherCount = 50; // Increased for better analytics data
+        for (let i = 0; i < teacherCount; i++) {
+            const teacher = new Teacher({
+                firstName: faker.person.firstName(),
+                lastName: faker.person.lastName(),
+                email: faker.internet.email(),
+                department: faker.helpers.arrayElement(departments)
+            });
+            await teacher.save();
+
+            // Create user account for teacher
+            const userPassword = await bcrypt.hash('password123', 8);
+            await User.create({
+                username: faker.internet.userName(),
+                password: userPassword,
+                email: teacher.email,
+                phone: faker.phone.number(),
+                role: 'user',
+                teacherId: teacher._id
+            });
+
+            // Create 2-3 courses for each teacher
+            const courseCount = faker.number.int({ min: 2, max: 3 });
+            for (let j = 0; j < courseCount; j++) {
+                const course = new Course({
+                    courseName: faker.company.catchPhrase(),
+                    code: faker.string.alphanumeric(6).toUpperCase(),
+                    description: faker.lorem.sentence(),
+                    credits: faker.number.int({ min: 1, max: 4 }),
+                    teacherId: teacher._id
+                });
+                await course.save();
             }
-        ];
-        await Certification.insertMany(certifications);
 
-        // Populate Employment
-        const employments = [
-            {
-                EmploymentID: 1,
-                StudentID: 1,
-                EmployerName: 'TechCorp',
-                StartDate: new Date('2021-01-01'),
-                EndDate: new Date('2022-01-01'),
-                JobTitle: 'Software Engineer',
-                JobDescription: 'Developed web applications'
-            }
-        ];
-        await Employment.insertMany(employments);
+            console.log(`Created teacher ${i + 1} of ${teacherCount}`);
+        }
 
-        // Populate Skills
-        const skills = [
-            {
-                SkillID: 1,
-                SkillName: 'JavaScript'
-            },
-            {
-                SkillID: 2,
-                SkillName: 'Python'
-            }
-        ];
-        await Skill.insertMany(skills);
-
-        // Populate StudentSkills
-        const studentSkills = [
-            {
-                StudentID: 1,
-                SkillID: 1
-            },
-            {
-                StudentID: 1,
-                SkillID: 2
-            }
-        ];
-        await StudentSkill.insertMany(studentSkills);
-
-        // Populate Courses
-        const courses = [
-            {
-                CourseID: 1,
-                CourseName: 'Intro to Programming',
-                Description: 'Basics of programming',
-                TeacherID: 1
-            }
-        ];
-        await Course.insertMany(courses);
-
-        console.log('Database populated with initial data');
-        mongoose.connection.close();
-    })
-    .catch(err => console.log('Failed to connect to MongoDB Atlas:', err));
+        console.log('Database population completed successfully');
+        process.exit(0);
+    } catch (error) {
+        console.error('Error populating database:', error);
+        process.exit(1);
+    }
+});

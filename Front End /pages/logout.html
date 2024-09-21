@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout Confirmation - Forbes College IMS</title>
+    <link rel="stylesheet" href="../styles/logout.css">
+    <link rel="stylesheet" href="../styles/global.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="logo">
+            <img src="../assets/FC_LOGO.png" alt="Forbes College Logo">
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="searchStudentPage.html">Search Students</a></li>
+            <li><a href="add-student.html">Add New Student</a></li>
+            <li><a href="updatedeletePage.html">Update/Delete Records</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+        <div class="bottom-nav">
+            <a href="profile.html" class="profile-btn">Profile</a>
+            <a href="logout.html" id="logoutBtn" class="logout-btn active">Logout</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="logout-container">
+            <h1 class="page-title">Logout Confirmation</h1>
+            <p>Are you sure you want to log out?</p>
+            <div class="logout-buttons">
+                <button id="confirmLogout" class="btn-primary">Yes, Logout</button>
+                <button id="cancelLogout" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="../src/logout.js"></script>
+<script src="../src/global.js"></script>
+</body>
+</html>

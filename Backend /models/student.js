@@ -1,20 +1,24 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const studentSchema = new Schema({
-    StudentID: { type: Number, required: true, unique: true },
-    FirstName: { type: String, required: true },
-    LastName: { type: String, required: true },
-    Email: { type: String, required: true },
-    CurrentEmployer: String,
-    PastEmployer: String,
-    CurrentField: String,
-    BachlorSubject: String,
-    HighSchoolGraduated: String,
-    Grade10Schools: String,
-    FinalProject: String,
-    LinkedInProfile: String
+const studentSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    gender: { type: String },
+    bachelorSubject: String,
+    dateOfEnrollment: Date,
+    currentSemester: Number,
+    highSchool: String,
+    grade10School: String,
+    certifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Certification' }],
+    employments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Employment' }],
+    projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
+    skills: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
+    profilePhoto: {
+        data: Buffer,
+        contentType: String
+    }
 });
 
-const Student = mongoose.model('Student', studentSchema);
+const Student = mongoose.models.Student || mongoose.model('Student', studentSchema);
 module.exports = Student;
